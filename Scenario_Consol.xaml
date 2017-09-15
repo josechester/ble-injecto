@@ -1,0 +1,29 @@
+﻿<Page
+    x:Class="SDKTemplate.Scenario_Consol"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SDKTemplate"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid Margin="0" Width="805" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBox x:Name="message" TextWrapping="Wrap" Text="" Height="28" Margin="10,15,162,503" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom" Width="528" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+            <Button x:Name="Send" Content="Enviar" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="586,15,52,503" Click="Send_Click" Width="62" Height="32" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom"/>
+            <TextBox x:Name="shell" TextWrapping="Wrap" Text="" IsReadOnly="True" Margin="10,81,0,0" Height="469" Width="690" HorizontalAlignment="Right" VerticalAlignment="Bottom" VerticalContentAlignment="Bottom" HorizontalContentAlignment="Right"/>
+            <Button x:Name="enter" Content="Enter" HorizontalAlignment="Left" Margin="27,132,0,0" VerticalAlignment="Top" Click="enter_Click"/>
+            <Button x:Name="right" Content="→ " HorizontalAlignment="Left" Margin="71,35,0,0" VerticalAlignment="Top" Width="32" Click="right_Click"/>
+            <Button x:Name="down" Content=" ↓" HorizontalAlignment="Left" Margin="36,72,0,0" VerticalAlignment="Top" Click="down_Click"/>
+            <Button x:Name="up" Content="↑" HorizontalAlignment="Left" Margin="36,0,0,0" VerticalAlignment="Top" Width="32" Click="up_Click"/>
+            <Button x:Name="left" Content="←" HorizontalAlignment="Left" Margin="0,35,0,0" VerticalAlignment="Top" Height="32" Width="32" Click="left_Click"/>
+            <Button x:Name="escape" Content="Esc" HorizontalAlignment="Left" Margin="27,187,0,0" VerticalAlignment="Top" Width="55" Click="escape_Click"/>
+            <Button x:Name="reset" Content="Reset" HorizontalAlignment="Left" Margin="27,243,0,0" VerticalAlignment="Top" Width="55" Click="reset_Click"/>
+        </Grid>
+        <TextBlock Text="Description:" Style="{StaticResource SampleHeaderTextStyle}" Margin="0,0,0,1042"/>
+        <TextBlock Style="{StaticResource ScenarioDescriptionTextStyle}" Text="Discover GATT servers" Margin="0,38,0,1022"/>
+        <TextBlock TextWrapping="Wrap" Margin="0,58,0,1002">
+            <Run Text="Enumerate nearby Bluetooth Low Energy devices, then select and pair a device, so that it can be used in the next scenario."/>
+        </TextBlock>
+    </Grid>
+</Page>
