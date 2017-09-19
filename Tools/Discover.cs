@@ -33,17 +33,34 @@ namespace SDKTemplate
         private static BluetoothLEDeviceDisplay Deviceinfo = null;
         public void Clear()
         {
-            StopBleDeviceWatcher();
             ResultCollection = null;
             findbyid = false;
 
+        }
+        private void stop()
+        {
+            if (watcheron == true)
+            {
+                StopBleDeviceWatcher();
+                watcheron = false;
+            }
+        }
+
+        private void start()
+        {
+            if (watcheron != true)
+            {
+                watcheron = true;
+                StartBleDeviceWatcher();   
+            }
         }
         public void Getnearlydevices(ref ObservableCollection<BluetoothLEDeviceDisplay> ResultCollection)
         {
 
             this.ResultCollection = ResultCollection;
             findbyid = false;
-            StartBleDeviceWatcher();
+            start();
+          
         }
         public void GetService(String id)
         {
@@ -73,14 +90,18 @@ namespace SDKTemplate
                 else
                     Deviceinfo = null;
             }
-            watcheron = true;
-            StartBleDeviceWatcher();
+            start();
                 
 
         }
         public void GetService(BluetoothLEDeviceDisplay deviceinfo)
         {
             rootPage.NotifyUser("Connecting ...", NotifyType.StatusMessage);
+            if (watcheron == true)
+            {
+                StopBleDeviceWatcher();
+                watcheron = false;
+            }
             if (deviceinfo == null)
                 rootPage.NotifyUser("Exeption DeviceInfo is null", NotifyType.ErrorMessage);
             else
@@ -90,26 +111,7 @@ namespace SDKTemplate
             }
         }
 
-        private void FindBLEDysplay()
-        {
-            if (id.Length == 9)
-                Deviceinfo = FindBluetoothLEbyPartofId(id);
-            else
-                Deviceinfo = FindBluetoothLEDeviceDisplay(id);
-            if (Deviceinfo == null)
-            {
-                if (watcheron == true)
-                {
-                    StopBleDeviceWatcher();
-                    watcheron = false;
-                }       
-                rootPage.NotifyUser("Device not found", NotifyType.ErrorMessage);
-            }
-            else
-            {
-                CheckConnectionAsync();
-            }
-        }
+       
         #region isAliveTemplate
         //just template
         /* private async void IsAlive()
@@ -161,9 +163,10 @@ namespace SDKTemplate
             BluetoothLEAttributeDisplay inmdiateAlert = null;
             var services = Gattservices.Services;
             int i = 0;
+            
             foreach (GattDeviceService service in Gattservices.Services)
             {
-                if (i == 3)
+                if (service.Uuid==GattAttributes.InmediateAlert.guid)
                 {
                     var characteristics = await service.GetCharacteristicsAsync();
                     foreach (GattCharacteristic c in characteristics.Characteristics)
@@ -174,8 +177,9 @@ namespace SDKTemplate
             try
             {
                 GattCommunicationStatus result = await inmdiateAlert.characteristic.WriteValueAsync
-                    (CryptographicBuffer.DecodeFromHexString("06"));
-                if (Deviceinfo.IsPaired == true && result == GattCommunicationStatus.Success)
+                    (GattAttributes.InmediateAlert.key.Esc);
+                //Deviceinfo.IsPaired == true &&
+                if ( result == GattCommunicationStatus.Success)
                 {
                     rootPage.NotifyUser("Device Connected", NotifyType.StatusMessage);
                     rootPage.Deviceinfo = Deviceinfo;
@@ -189,6 +193,7 @@ namespace SDKTemplate
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80650003 || (uint)ex.HResult == 0x80070005)
             {
+                rootPage.NotifyUser(ex.Message.ToString(), NotifyType.ErrorMessage);
             }
             if (watcheron == true)
             {
@@ -343,12 +348,6 @@ namespace SDKTemplate
                  {
                     /* rootPage.NotifyUser($"{ResultCollection.Count} devices found. Enumeration completed.",
                          NotifyType.StatusMessage);*/
-                        if (findbyid == true)
-                        {
-                            FindBLEDysplay();
-                        }
-                    
-                    //its use to assign the global info for ble if is necessary
                 }
             });
         }

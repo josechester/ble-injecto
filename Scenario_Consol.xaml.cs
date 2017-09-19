@@ -41,37 +41,37 @@ namespace SDKTemplate
 
         private void up_Click(object sender, RoutedEventArgs e)
         {
-            ble.WriteInmediateAlert("00");
+            ble.WriteInmediateAlert(GattAttributes.InmediateAlert.key.Up);
         }
 
         private void left_Click(object sender, RoutedEventArgs e)
         {
-            ble.WriteInmediateAlert("02");
+            ble.WriteInmediateAlert(GattAttributes.InmediateAlert.key.Left);
         }
 
         private void down_Click(object sender, RoutedEventArgs e)
         {
-            ble.WriteInmediateAlert("04");
+            ble.WriteInmediateAlert(GattAttributes.InmediateAlert.key.Down);
         }
 
         private void right_Click(object sender, RoutedEventArgs e)
         {
-            ble.WriteInmediateAlert("05");
+            ble.WriteInmediateAlert(GattAttributes.InmediateAlert.key.Right);
         }
 
         private void enter_Click(object sender, RoutedEventArgs e)
         {
-            ble.WriteInmediateAlert("03");
+            ble.WriteInmediateAlert(GattAttributes.InmediateAlert.key.Enter);
         }
 
         private void reset_Click(object sender, RoutedEventArgs e)
         {
-            ble.WriteInmediateAlert("06");
+            ble.WriteInmediateAlert(GattAttributes.InmediateAlert.key.Reset);
         }
 
         private void escape_Click(object sender, RoutedEventArgs e)
         {
-            ble.WriteInmediateAlert("01");
+            ble.WriteInmediateAlert(GattAttributes.InmediateAlert.key.Esc);
         }
     }
 }
