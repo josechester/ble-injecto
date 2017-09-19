@@ -21,7 +21,7 @@ namespace SDKTemplate
         {
             public static readonly Guid guid = new Guid("00001802-0000-1000-8000-00805f9b34fb");
             public static readonly Guid Alertlevel = new Guid("00002a06-0000-1000-8000-00805f9b34fb");
-            public static class key
+            public static class Key
             {
                 public static readonly Windows.Storage.Streams.IBuffer Up = CryptographicBuffer.DecodeFromHexString("00");
                 public static readonly Windows.Storage.Streams.IBuffer Esc = CryptographicBuffer.DecodeFromHexString("01");

@@ -69,5 +69,6 @@
             <Image x:Name="WindowsLogo" Stretch="None" Source="Assets/logo-tiny-free.png" />
             <TextBlock x:Name="Header" Style="{StaticResource TagLineTextStyle}" Margin="0,15,0,0" Text="CJ4-CONNECT" />
         </StackPanel>
+        
     </Grid>
 </Page>

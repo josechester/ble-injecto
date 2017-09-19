@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -11,8 +12,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-
-
+using static SDKTemplate.GattAttributes.InmediateAlert;
 
 namespace SDKTemplate
 {
@@ -23,7 +23,7 @@ namespace SDKTemplate
         private List<BluetoothLEAttributeDisplay> InmediateAlert = new List<BluetoothLEAttributeDisplay>();
         private DeviceWatcher deviceWatcher;
         private String id;
-        //findbyid is to turn on the function findBLEDysplay() on the asyncronous function when all devices are detected 
+        //flags sync functions
         private bool findbyid = false;
         private bool watcheron = false;
         public Discover(MainPage rootpage)
@@ -56,15 +56,16 @@ namespace SDKTemplate
         }
         public void Getnearlydevices(ref ObservableCollection<BluetoothLEDeviceDisplay> ResultCollection)
         {
-
+            rootPage.NotifyUser("", NotifyType.StatusMessage);
             this.ResultCollection = ResultCollection;
+            ResultCollection.Clear();
             findbyid = false;
             start();
           
         }
         public void GetService(String id)
         {
-            rootPage.NotifyUser("Connecting ...", NotifyType.StatusMessage);
+            rootPage.NotifyUser("", NotifyType.StatusMessage);
             ResultCollection = new ObservableCollection<BluetoothLEDeviceDisplay>();
             findbyid = true;
             char[] a = id.ToCharArray();
@@ -96,7 +97,8 @@ namespace SDKTemplate
         }
         public void GetService(BluetoothLEDeviceDisplay deviceinfo)
         {
-            rootPage.NotifyUser("Connecting ...", NotifyType.StatusMessage);
+            //rootPage.NotifyUser("Connecting ...", NotifyType.StatusMessage);
+           
             if (watcheron == true)
             {
                 StopBleDeviceWatcher();
@@ -156,7 +158,9 @@ namespace SDKTemplate
         #endregion
         private async void CheckConnectionAsync()
         {
-          if (Deviceinfo.IsPaired==false)
+            Tools.MessageScreen dialog = new Tools.MessageScreen("Connecting");
+            dialog.Show();
+            if (Deviceinfo.IsPaired==false)
                     await Deviceinfo.DeviceInformation.Pairing.PairAsync();
             BluetoothLEDevice bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(Deviceinfo.Id);
             GattDeviceServicesResult Gattservices = await bluetoothLeDevice.GetGattServicesAsync();
@@ -174,11 +178,11 @@ namespace SDKTemplate
                 }
                 i++;
             }
+            dialog.Close();
             try
             {
-                GattCommunicationStatus result = await inmdiateAlert.characteristic.WriteValueAsync
-                    (GattAttributes.InmediateAlert.key.Esc);
-                //Deviceinfo.IsPaired == true &&
+                GattCommunicationStatus result = await inmdiateAlert.characteristic.WriteValueAsync(Key.Esc);
+                dialog.Close();
                 if ( result == GattCommunicationStatus.Success)
                 {
                     rootPage.NotifyUser("Device Connected", NotifyType.StatusMessage);

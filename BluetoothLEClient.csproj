@@ -96,6 +96,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tools\MessageScreen.cs" />
     <Compile Include="Tools\Comunication.cs" />
     <Compile Include="Tools\Discover.cs" />
     <Compile Include="Tools\GattAttributes.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Scenario2_ConnectToServer.xaml.cs">
       <DependentUpon>Scenario2_ConnectToServer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tools\RemoteShell.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
