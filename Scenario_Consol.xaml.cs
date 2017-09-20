@@ -75,5 +75,6 @@ namespace SDKTemplate
         {
             comunication.RemoteKey(Key.Esc);
         }
+      
     }
 }

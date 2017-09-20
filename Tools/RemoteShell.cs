@@ -10,8 +10,7 @@ namespace SDKTemplate.Tools
     class RemoteShell
     {
         private MainPage rootPage;
-        private Comunication ble;
-        Comunication comunication;
+        private Comunication comunication;
         bool Error = false;
         int limit = 5;
         private RemoteShell()
@@ -27,48 +26,44 @@ namespace SDKTemplate.Tools
         {
             Error = false;
             String program = "pass.cj4";
+            Byte[] arg = { (byte)0x00 };
             Tools.MessageScreen dialog = new Tools.MessageScreen("Restarting CJ4...");
             dialog.Show();
                 await RestartCJ4();
                 dialog.setTitle("Accesing Remote Shell...");
-                await RemoteShellAccess();
+            await RemoteShellAccess();
             if (Error == true)
             {
-                dialog.setTitle("could'n access to remote Shell " + program);
-                await PutTaskDelay(3000);
-                dialog.Close();
+                dialog.SetwithButton("could'n conect to remote Shell", "Please use a update device to this function or if your device is up to day please contact support", "Ok");
                 return;
             }
                 dialog.setTitle("Accesing Files...");
-                await CdToFiles();
+            await CdToFiles();
             if (Error == true)
             {
-                dialog.setTitle("Could'n Access to Files" + program);
-                await PutTaskDelay(3000);
-                dialog.Close();
+                dialog.SetwithButton("could'n conect to remote Shell", "Please use a update device to this function or if your device is up to day please contact support", "Ok");
                 return;
             }
             dialog.setTitle("Executing Program");
                 await ExecuteFile(program);
             if (Error == true)
-                dialog.setTitle("could'n execute program" + program);
+                dialog.SetwithButton("could'n execute program" + program, "Please use a update device to this function or if your device is up to day please contact support", "Ok");
             else
-                dialog.setTitle("Program " + program +" is running");
-            await PutTaskDelay(3000);
-            dialog.Close();
+                dialog.set("Sucess","Program " + program +" is running",2000);
         }
         private async Task RestartCJ4()
         {
             comunication.WriteInmediateAlert(Key.Reset);
             await PutTaskDelay(3000);
         }
+       
         private async Task RemoteShellAccess()
         {
             Byte[] arg = { (byte)0x00 };
             Byte[] command = CommandBuilder(arg, (byte)0x00);
             Byte[] response = null;
             int tries = 0;
-            while (tries<limit && (response == null || response[response.Length - 1] != 88))
+            while (tries < limit && (response == null || response[response.Length - 1] != 88))
             {
                 comunication.sendrequest(command);
                 comunication.waitaresponse();
@@ -77,7 +72,7 @@ namespace SDKTemplate.Tools
                 tries++;
             }
             if (tries == limit)
-                Error = true;    
+                Error = true;
         }
         private async Task CdToFiles()
         {

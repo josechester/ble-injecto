@@ -33,7 +33,11 @@ namespace SDKTemplate
         private static BluetoothLEDeviceDisplay Deviceinfo = null;
         public void Clear()
         {
-            ResultCollection = null;
+            if(ResultCollection!=null)
+                ResultCollection.Clear();
+            if (InmediateAlert != null)
+                InmediateAlert.Clear();
+            stop();
             findbyid = false;
 
         }
@@ -56,6 +60,7 @@ namespace SDKTemplate
         }
         public void Getnearlydevices(ref ObservableCollection<BluetoothLEDeviceDisplay> ResultCollection)
         {
+            this.Clear();
             rootPage.NotifyUser("", NotifyType.StatusMessage);
             this.ResultCollection = ResultCollection;
             ResultCollection.Clear();
@@ -65,6 +70,7 @@ namespace SDKTemplate
         }
         public void GetService(String id)
         {
+            Clear();
             rootPage.NotifyUser("", NotifyType.StatusMessage);
             ResultCollection = new ObservableCollection<BluetoothLEDeviceDisplay>();
             findbyid = true;
@@ -98,12 +104,8 @@ namespace SDKTemplate
         public void GetService(BluetoothLEDeviceDisplay deviceinfo)
         {
             //rootPage.NotifyUser("Connecting ...", NotifyType.StatusMessage);
-           
-            if (watcheron == true)
-            {
-                StopBleDeviceWatcher();
-                watcheron = false;
-            }
+
+            Clear();
             if (deviceinfo == null)
                 rootPage.NotifyUser("Exeption DeviceInfo is null", NotifyType.ErrorMessage);
             else
@@ -170,27 +172,37 @@ namespace SDKTemplate
             
             foreach (GattDeviceService service in Gattservices.Services)
             {
-                if (service.Uuid==GattAttributes.InmediateAlert.guid)
+                if (service.Uuid==GattAttributes.UknownService.guid)
                 {
                     var characteristics = await service.GetCharacteristicsAsync();
                     foreach (GattCharacteristic c in characteristics.Characteristics)
-                        inmdiateAlert = new BluetoothLEAttributeDisplay(c);
+                    {
+                        //if(c.Uuid== GattAttributes.InmediateAlert.Alertlevel)
+                        if (c.Uuid == GattAttributes.UknownService.Tx)
+                            inmdiateAlert = new BluetoothLEAttributeDisplay(c);
+                    }
                 }
                 i++;
             }
-            dialog.Close();
+            if (inmdiateAlert == null)
+            {
+                dialog.SetwithButton("Device Connection failed", "This Program just works with a CJ4, please purchase with a Certified distributor", "Ok");
+                return;
+            }
             try
             {
-                GattCommunicationStatus result = await inmdiateAlert.characteristic.WriteValueAsync(Key.Esc);
-                dialog.Close();
-                if ( result == GattCommunicationStatus.Success)
+                //GattCommunicationStatus result = await inmdiateAlert.characteristic.WriteValueAsync(Key.Esc);
+                GattWriteResult result = await inmdiateAlert.characteristic.WriteValueWithResultAsync(Key.Esc);
+                //GattReadResult result = await inmdiateAlert.characteristic.ReadValueAsync();
+                if ( result.Status == GattCommunicationStatus.Success)
                 {
-                    rootPage.NotifyUser("Device Connected", NotifyType.StatusMessage);
+                    dialog.set("Correct","Device Connection success", 1500);
                     rootPage.Deviceinfo = Deviceinfo;
+                    this.Clear();
                 }
                 else
                 {
-                    rootPage.NotifyUser("Device Could't get connection", NotifyType.ErrorMessage);
+                    dialog.SetwithButton("Device Connection failed", "Please Reset CJ4 manually and try again", "Ok");
                     rootPage.Deviceinfo = null;
                     Deviceinfo = null;
                 }
@@ -198,6 +210,7 @@ namespace SDKTemplate
             catch (Exception ex) when ((uint)ex.HResult == 0x80650003 || (uint)ex.HResult == 0x80070005)
             {
                 rootPage.NotifyUser(ex.Message.ToString(), NotifyType.ErrorMessage);
+                dialog.SetwithButton("Device Connection failed", "This Program just works with a CJ4 with BLE Tecnology, please purchase with a Certified distributor", "Ok");
             }
             if (watcheron == true)
             {

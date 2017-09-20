@@ -69,6 +69,12 @@ namespace SDKTemplate
                 rootPage.NotifyUser("Please select a device on the list", NotifyType.ErrorMessage);
         }
 
-   
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (this.discover != null)
+            {
+                discover.Clear();
+            }
+        }
     }
 }
