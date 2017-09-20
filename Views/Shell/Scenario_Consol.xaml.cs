@@ -34,47 +34,14 @@ namespace SDKTemplate
             this.InitializeComponent();
             rootPage = MainPage.Current;
             comunication = new RemoteShell(rootPage);
+            comunication.SetupCJ4();
         }
 
         private void Send_Click(object sender, RoutedEventArgs e)
         {
-            comunication.SetupCJ4();
+            
         }
 
-        private void up_Click(object sender, RoutedEventArgs e)
-        {
-            comunication.RemoteKey(Key.Up);
-        }
-
-        private void left_Click(object sender, RoutedEventArgs e)
-        {
-            comunication.RemoteKey(Key.Left);
-        }
-
-        private void down_Click(object sender, RoutedEventArgs e)
-        {
-            comunication.RemoteKey(Key.Down);
-        }
-
-        private void right_Click(object sender, RoutedEventArgs e)
-        {
-            comunication.RemoteKey(Key.Right);
-        }
-
-        private void enter_Click(object sender, RoutedEventArgs e)
-        {
-            comunication.RemoteKey(Key.Enter);
-        }
-
-        private void reset_Click(object sender, RoutedEventArgs e)
-        {
-            comunication.RemoteKey(Key.Reset);
-        }
-
-        private void escape_Click(object sender, RoutedEventArgs e)
-        {
-            comunication.RemoteKey(Key.Esc);
-        }
-      
+        
     }
 }

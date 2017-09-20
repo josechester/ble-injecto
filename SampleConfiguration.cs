@@ -1,4 +1,5 @@
 
+using SDKTemplate.Views.Shell;
 using System;
 using System.Collections.Generic;
 using Windows.UI.Xaml.Controls;
@@ -13,8 +14,9 @@ namespace SDKTemplate
         {
             new Scenario() { Title="Discover servers", ClassType=typeof(Scenario1_DiscoverServer) },
             new Scenario() { Title="Connect to a server", ClassType=typeof(Scenario2_ConnectToServer) },
-             new Scenario() { Title="Shell", ClassType=typeof(Scenario_Consol) }
-
+            new Scenario() { Title="Remote Control", ClassType=typeof(RemoteControl) },
+            new Scenario() { Title="Shell", ClassType=typeof(Scenario_Consol) }
+           
 
          };
         

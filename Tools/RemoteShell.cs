@@ -24,10 +24,13 @@ namespace SDKTemplate.Tools
         }
         public async void SetupCJ4()
         {
+           
             Error = false;
             String program = "pass.cj4";
             Byte[] arg = { (byte)0x00 };
             Tools.MessageScreen dialog = new Tools.MessageScreen("Restarting CJ4...");
+            if (!comunication.isready)
+                await PutTaskDelay(1000);
             dialog.Show();
                 await RestartCJ4();
                 dialog.setTitle("Accesing Remote Shell...");
@@ -49,7 +52,7 @@ namespace SDKTemplate.Tools
             if (Error == true)
                 dialog.SetwithButton("could'n execute program" + program, "Please use a update device to this function or if your device is up to day please contact support", "Ok");
             else
-                dialog.set("Sucess","Program " + program +" is running",2000);
+                dialog.set("Sucess","Program " + program +" is running",1500);
         }
         private async Task RestartCJ4()
         {

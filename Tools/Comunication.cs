@@ -27,6 +27,7 @@ namespace SDKTemplate
         private GattCharacteristicsResult characteristics;
         private bool isValueChangedHandlerRegistered = false;
         private GattPresentationFormat presentationFormat;
+        public bool isready = false;
 
         private Byte[] response;
 
@@ -59,6 +60,7 @@ namespace SDKTemplate
                 i++;
             }
             i = 0;
+            isready = true;
         }
         private async void getservices(GattDeviceService service)
         {
@@ -80,6 +82,7 @@ namespace SDKTemplate
     # endregion
         public async void WriteInmediateAlert(Windows.Storage.Streams.IBuffer com)
         {
+            
             try
             {
                 var result = await InmediateAlert.ElementAt(0).characteristic.WriteValueAsync(com);
