@@ -1,20 +1,14 @@
-﻿using System;
+﻿using Injectoclean.Tools.UserHelpers;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
-using Windows.Security.Cryptography;
 using Windows.UI.Core;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
-using static SDKTemplate.GattAttributes.InmediateAlert;
+using static Injectoclean.Tools.BLE.GattAttributes.InmediateAlert;
 
-namespace SDKTemplate
+namespace Injectoclean.Tools.BLE
 {
     class Discover
     {
@@ -160,7 +154,7 @@ namespace SDKTemplate
         #endregion
         private async void CheckConnectionAsync()
         {
-            Tools.MessageScreen dialog = new Tools.MessageScreen("Connecting");
+            MessageScreen dialog = new MessageScreen("Connecting");
             dialog.Show();
             if (Deviceinfo.IsPaired==false)
                     await Deviceinfo.DeviceInformation.Pairing.PairAsync();
@@ -191,7 +185,6 @@ namespace SDKTemplate
             }
             try
             {
-                //GattCommunicationStatus result = await inmdiateAlert.characteristic.WriteValueAsync(Key.Esc);
                 GattWriteResult result = await inmdiateAlert.characteristic.WriteValueWithResultAsync(Key.Esc);
                 //GattReadResult result = await inmdiateAlert.characteristic.ReadValueAsync();
                 if ( result.Status == GattCommunicationStatus.Success)

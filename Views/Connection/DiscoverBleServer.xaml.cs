@@ -1,24 +1,21 @@
 
+using Injectoclean.Tools.BLE;
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using Windows.Devices.Bluetooth;
-using Windows.Devices.Enumeration;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
 
-namespace SDKTemplate
+namespace Injectoclean
 {
- 
-    public sealed partial class Scenario1_DiscoverServer : Page
+
+    public sealed partial class DiscoverBleServer : Page
     {
         private MainPage rootPage = MainPage.Current;
 
         private ObservableCollection<BluetoothLEDeviceDisplay> ResultCollection = new ObservableCollection<BluetoothLEDeviceDisplay>();
         private Discover discover;
 
-        public Scenario1_DiscoverServer()
+        public DiscoverBleServer()
         {
             InitializeComponent();
             ResultsListView.Header=

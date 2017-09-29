@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Injectoclean.Tools.BLE;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static SDKTemplate.GattAttributes.InmediateAlert;
+using static Injectoclean.Tools.BLE.GattAttributes;
+using Injectoclean.Tools.UserHelpers;
+using static Injectoclean.Tools.BLE.GattAttributes.InmediateAlert;
 
-namespace SDKTemplate.Tools
+namespace Injectoclean.Tools.Developers
 {
     class RemoteShell
     {
@@ -19,28 +22,28 @@ namespace SDKTemplate.Tools
 
         public RemoteShell(MainPage mainPage)
         {
-           this.rootPage = mainPage;
-           comunication = new Comunication(mainPage);
+            this.rootPage = mainPage;
+            comunication = new Comunication(mainPage);
         }
         public async void SetupCJ4()
         {
-           
+
             Error = false;
             String program = "pass.cj4";
             Byte[] arg = { (byte)0x00 };
-            Tools.MessageScreen dialog = new Tools.MessageScreen("Restarting CJ4...");
+            MessageScreen dialog = new MessageScreen("Restarting CJ4...");
             if (!comunication.isready)
                 await PutTaskDelay(1000);
             dialog.Show();
-                await RestartCJ4();
-                dialog.setTitle("Accesing Remote Shell...");
+            await RestartCJ4();
+            dialog.setTitle("Accesing Remote Shell...");
             await RemoteShellAccess();
             if (Error == true)
             {
                 dialog.SetwithButton("could'n conect to remote Shell", "Please use a update device to this function or if your device is up to day please contact support", "Ok");
                 return;
             }
-                dialog.setTitle("Accesing Files...");
+            dialog.setTitle("Accesing Files...");
             await CdToFiles();
             if (Error == true)
             {
@@ -48,18 +51,18 @@ namespace SDKTemplate.Tools
                 return;
             }
             dialog.setTitle("Executing Program");
-                await ExecuteFile(program);
+            await ExecuteFile(program);
             if (Error == true)
                 dialog.SetwithButton("could'n execute program" + program, "Please use a update device to this function or if your device is up to day please contact support", "Ok");
             else
-                dialog.set("Sucess","Program " + program +" is running",1500);
+                dialog.set("Sucess", "Program " + program + " is running", 1500);
         }
         private async Task RestartCJ4()
         {
             comunication.WriteInmediateAlert(Key.Reset);
             await PutTaskDelay(3000);
         }
-       
+
         private async Task RemoteShellAccess()
         {
             Byte[] arg = { (byte)0x00 };
@@ -117,11 +120,11 @@ namespace SDKTemplate.Tools
                     break;
                 }
                 else
-                tries++;
+                    tries++;
             }
-            if(!running)
+            if (!running)
                 Error = true;
-           
+
         }
         async Task PutTaskDelay(int time)
         {
@@ -144,7 +147,33 @@ namespace SDKTemplate.Tools
         }
         public void RemoteKey(Windows.Storage.Streams.IBuffer com)
         {
-           comunication.WriteInmediateAlert(com);
+            comunication.WriteInmediateAlert(com);
+        }
+        public async Task SendCommand(Byte[] Command)
+        {
+            comunication.sendrequest(Command);
+            comunication.waitaresponse();
+            await PutTaskDelay(500);
+        }
+        public string getResponse()
+        {
+            return comunication.GetstringResponse();
+        }
+        public byte[] CommandBuilder(String line)
+        {
+
+            String[] array = line.Split(' ');
+            Byte[] temp = new byte[array.Length];
+            Byte[] Command = Enumerable.Repeat((byte)0x00, 15).ToArray();
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                temp[i] = (byte)Convert.ToInt32(array[i], 16);
+                Command[i] = temp[i];
+                Command[14] += Command[i];
+            }
+            Command[14] -= Command[0];
+            return Command;
         }
     }
 }

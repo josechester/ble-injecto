@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Devices.Enumeration;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Data;
+using System.Collections.Generic;
+using System.ComponentModel;
+using Windows.Devices.Enumeration;
 using Windows.UI.Xaml.Media.Imaging;
 
-namespace SDKTemplate
+namespace Injectoclean.Tools.BLE
 {
     /// <summary>
     ///     Represents the display of an attribute - both characteristics and services.
@@ -124,12 +124,14 @@ namespace SDKTemplate
         public bool IsPaired => DeviceInformation.Pairing.IsPaired;
         public bool IsConnected => (bool?)DeviceInformation.Properties["System.Devices.Aep.IsConnected"] == true;
 
-        public string getshortId{
-            get {
+        public string getshortId
+        {
+            get
+            {
                 return Id.Substring(50, 8).Replace(":", "");
             }
             private set { }
-                        }
+        }
         public string getaddresstId
         {
             get

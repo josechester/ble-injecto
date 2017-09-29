@@ -1,8 +1,8 @@
 
+using Injectoclean.Tools.BLE;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Security.Cryptography;
@@ -12,7 +12,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
-namespace SDKTemplate
+namespace Injectoclean
 {
     // This scenario connects to the device selected in the "Discover
     // GATT Servers" scenario and communicates with it.
@@ -20,7 +20,7 @@ namespace SDKTemplate
     // with an unknown service with unknown characteristics.
     // In practice, your app will be interested in a specific service with
     // a specific characteristic.
-    public sealed partial class Scenario2_ConnectToServer : Page
+    public sealed partial class ConnectBleServer : Page
     {
         private MainPage rootPage = MainPage.Current;
 
@@ -32,7 +32,7 @@ namespace SDKTemplate
         private bool isValueChangedHandlerRegistered = false;
         private GattPresentationFormat presentationFormat;
 
-        public Scenario2_ConnectToServer()
+        public ConnectBleServer()
         {
             InitializeComponent();
         }

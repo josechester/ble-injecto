@@ -1,21 +1,13 @@
 ﻿using System;
-
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Devices.Enumeration;
 using Windows.Security.Cryptography;
-using Windows.Storage.Streams;
-using Windows.UI.Core;
 //notes make just one class to allow use asyncronous metods
-namespace SDKTemplate
+namespace Injectoclean.Tools.BLE
 {
-     class Comunication
+    class Comunication
     {
 
         private List<BluetoothLEAttributeDisplay> ServiceCollection = new List<BluetoothLEAttributeDisplay>();
@@ -33,19 +25,19 @@ namespace SDKTemplate
 
         public Byte[] getResponse()
         {
-            Byte[] temp=response;
+            Byte[] temp = response;
             response = null;
-            return temp; 
+            return temp;
         }
-        private Comunication(){}
-        public  Comunication(MainPage rootpage)
+        private Comunication() { }
+        public Comunication(MainPage rootpage)
         {
             this.rootPage = rootpage;
             GetServices();
             //presentationFormat.FormatType.ToString();
         }
-       
-    #region getServices&Characteristics
+
+        #region getServices&Characteristics
         private async void GetServices()
         {
             bluetoothLeDevice?.Dispose();
@@ -69,9 +61,9 @@ namespace SDKTemplate
                 CharacteristicCollection = InmediateAlert;
             else
                      if (service.Uuid == GattAttributes.UknownService.guid)
-                            CharacteristicCollection = Custom;
-                      else
-                            return;
+                CharacteristicCollection = Custom;
+            else
+                return;
             characteristics = await service.GetCharacteristicsAsync();
             foreach (GattCharacteristic c in characteristics.Characteristics)
             {
@@ -79,10 +71,10 @@ namespace SDKTemplate
             }
 
         }
-    # endregion
+        #endregion
         public async void WriteInmediateAlert(Windows.Storage.Streams.IBuffer com)
         {
-            
+
             try
             {
                 var result = await InmediateAlert.ElementAt(0).characteristic.WriteValueAsync(com);
@@ -95,7 +87,7 @@ namespace SDKTemplate
             }
 
         }
-        
+
         public async void sendrequest(Byte[] message)
         {
             try
@@ -127,7 +119,7 @@ namespace SDKTemplate
                 rootPage.NotifyUser(ex.Message, NotifyType.ErrorMessage);
             }
         }
-    #region ResponseHandlers
+        #region ResponseHandlers
         //private readonly CoreDispatcher dispatcher=new CoreDispatcher();
         /*async //it was but works better lik that*/
         private void Characteristic_ValueChanged(GattCharacteristic sender, GattValueChangedEventArgs args)
@@ -137,7 +129,7 @@ namespace SDKTemplate
                 CryptographicBuffer.CopyToByteArray(args.CharacteristicValue, out response);
                 RemoveValueChangedHandler(); //this is just for one response
             }
-            
+
         }
         private void RemoveValueChangedHandler()
         {
@@ -155,14 +147,14 @@ namespace SDKTemplate
                 isValueChangedHandlerRegistered = true;
             }
         }
-    #endregion
+        #endregion
 
-    #region ResponseFormats
+        #region ResponseFormats
         public String GetstringResponse()
         {
             String temp = "";
             if (response == null)
-                return "Response is Null";
+                return "Null";
             for (int i = 0; i < response.Length; i++)
             {
                 if (i == 0)
@@ -172,7 +164,7 @@ namespace SDKTemplate
             }
             return temp;
         }
-        private String GetstringFromBytes(Byte[] array )
+        private String GetstringFromBytes(Byte[] array)
         {
             String temp = "";
             for (int i = 0; i < array.Length; i++)
@@ -184,6 +176,6 @@ namespace SDKTemplate
             }
             return temp;
         }
-    #endregion
+        #endregion
     }
 }

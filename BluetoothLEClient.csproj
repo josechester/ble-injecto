@@ -7,7 +7,7 @@
     <ProjectGuid>{4F601390-640F-5066-BF31-C45A23884F94}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SDKTemplate</RootNamespace>
+    <RootNamespace>Injectoclean</RootNamespace>
     <AssemblyName>BluetoothLEClient</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
@@ -90,16 +90,21 @@
     <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Assets\Data\dbFordVinGeneric.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\MessageScreen.cs" />
-    <Compile Include="Tools\Comunication.cs" />
-    <Compile Include="Tools\Discover.cs" />
-    <Compile Include="Tools\GattAttributes.cs" />
+    <Compile Include="Tools\Data\Containers\FordData.cs" />
+    <Compile Include="Tools\Data\Db_connectioncs.cs" />
+    <Compile Include="Tools\UserHelpers\MessageScreen.cs" />
+    <Compile Include="Tools\BLE\Comunication.cs" />
+    <Compile Include="Tools\BLE\Discover.cs" />
+    <Compile Include="Tools\BLE\GattAttributes.cs" />
     <Compile Include="Views\MainPage.xaml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\Shell\RemoteControl.xaml.cs">
@@ -108,15 +113,15 @@
     <Compile Include="Views\Shell\Scenario_Consol.xaml.cs">
       <DependentUpon>Scenario_Consol.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\DisplayHelpers.cs" />
+    <Compile Include="Tools\BLE\DisplayHelpers.cs" />
     <Compile Include="SampleConfiguration.cs" />
-    <Compile Include="Views\Connection\Scenario1_DiscoverServer.xaml.cs">
-      <DependentUpon>Scenario1_DiscoverServer.xaml</DependentUpon>
+    <Compile Include="Views\Connection\DiscoverBleServer.xaml.cs">
+      <DependentUpon>DiscoverBleServer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Connection\Scenario2_ConnectToServer.xaml.cs">
-      <DependentUpon>Scenario2_ConnectToServer.xaml</DependentUpon>
+    <Compile Include="Views\Connection\ConnectBleServer.xaml.cs">
+      <DependentUpon>ConnectBleServer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\RemoteShell.cs" />
+    <Compile Include="Tools\Developers\RemoteShell.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -140,11 +145,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Connection\Scenario1_DiscoverServer.xaml">
+    <Page Include="Views\Connection\DiscoverBleServer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Connection\Scenario2_ConnectToServer.xaml">
+    <Page Include="Views\Connection\ConnectBleServer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
