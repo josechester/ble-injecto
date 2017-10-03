@@ -99,7 +99,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Data\Containers\FordData.cs" />
+    <Compile Include="Tools\Data\Ford\FordCarInfo.cs" />
+    <Compile Include="Tools\Data\Ford\FordData.cs" />
     <Compile Include="Tools\Data\Db_connectioncs.cs" />
     <Compile Include="Tools\UserHelpers\MessageScreen.cs" />
     <Compile Include="Tools\BLE\Comunication.cs" />

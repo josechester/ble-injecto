@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="BluetoothLEClient.App" Executable="$targetnametoken$.exe" EntryPoint="BluetoothLEClient.App">
-      <uap:VisualElements DisplayName="Bluetooth Low Energy Client C# sample" Square150x150Logo="Assets\squareTile-sdk.png" Square44x44Logo="Assets\SmallTile-sdk.png" Description="Bluetooth Low Energy Client C# sample" BackgroundColor="#ffffff">
+      <uap:VisualElements DisplayName="CJ4-Connect" Square150x150Logo="Assets\squareTile-sdk.png" Square44x44Logo="Assets\SmallTile-sdk.png" Description="CJ4-Scanner connection for ford cars" BackgroundColor="#ffffff">
         <uap:DefaultTile Square310x310Logo="Assets\LargeTile.png" Wide310x150Logo="Assets\WideTile.png" Square71x71Logo="Assets\SmallTile.png">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="square150x150Logo" />
