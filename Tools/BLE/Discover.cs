@@ -1,5 +1,4 @@
-﻿using Injectoclean.Tools.UserHelpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Windows.Devices.Bluetooth;
@@ -10,21 +9,27 @@ using static Injectoclean.Tools.BLE.GattAttributes.InmediateAlert;
 
 namespace Injectoclean.Tools.BLE
 {
-    class Discover
+    public class Discover
     {
-        private MainPage rootPage;
         private ObservableCollection<BluetoothLEDeviceDisplay> ResultCollection;
         private List<BluetoothLEAttributeDisplay> InmediateAlert = new List<BluetoothLEAttributeDisplay>();
         private DeviceWatcher deviceWatcher;
         private String id;
         //flags sync functions
+        protected ILog log;
+        protected ILockScreen dialog;
+        protected IDeviceInfo DeviceInfo;
         private bool findbyid = false;
         private bool watcheron = false;
-        public Discover(MainPage rootpage)
+        public Discover(IDeviceInfo DeviceInfo,ILog log,ILockScreen dialog)
         {
-            this.rootPage = rootpage;
+            this.log = log;
+            this.dialog = dialog;
+            this.DeviceInfo = DeviceInfo;
         }
-        private static BluetoothLEDeviceDisplay Deviceinfo = null;
+
+        private BluetoothLEDeviceDisplay Deviceinfo = null;
+
         public void Clear()
         {
             if(ResultCollection!=null)
@@ -55,7 +60,7 @@ namespace Injectoclean.Tools.BLE
         public void Getnearlydevices(ref ObservableCollection<BluetoothLEDeviceDisplay> ResultCollection)
         {
             this.Clear();
-            rootPage.NotifyUser("", NotifyType.StatusMessage);
+            log.LogMessageNotification("");
             this.ResultCollection = ResultCollection;
             ResultCollection.Clear();
             findbyid = false;
@@ -65,7 +70,7 @@ namespace Injectoclean.Tools.BLE
         public void GetService(String id)
         {
             Clear();
-            rootPage.NotifyUser("", NotifyType.StatusMessage);
+            log.LogMessageNotification("");
             ResultCollection = new ObservableCollection<BluetoothLEDeviceDisplay>();
             findbyid = true;
             char[] a = id.ToCharArray();
@@ -101,7 +106,7 @@ namespace Injectoclean.Tools.BLE
 
             Clear();
             if (deviceinfo == null)
-                rootPage.NotifyUser("Exeption DeviceInfo is null", NotifyType.ErrorMessage);
+                log.LogMessageError("Exeption DeviceInfo is null");
             else
             {
                 Deviceinfo = deviceinfo;
@@ -109,55 +114,11 @@ namespace Injectoclean.Tools.BLE
             }
         }
 
-       
-        #region isAliveTemplate
-        //just template
-        /* private async void IsAlive()
-         {
-             BluetoothLEDevice bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(Deviceinfo.Id);
-             GattDeviceServicesResult Gattservices = await bluetoothLeDevice.GetGattServicesAsync();
-             BluetoothLEAttributeDisplay inmdiateAlert = null;
-             var services = Gattservices.Services;
-             int i = 0;
-             foreach (GattDeviceService service in Gattservices.Services)
-             {
-                 if (i == 3)
-                 {
-                     var characteristics = await service.GetCharacteristicsAsync();
-                     foreach (GattCharacteristic c in characteristics.Characteristics)
-                     {
-                         inmdiateAlert = new BluetoothLEAttributeDisplay(c);
-                     }
-                 }
-                 i++;
-             }
-             var writeBuffer = CryptographicBuffer.DecodeFromHexString("06");
-
-             try
-             {
-                 GattCommunicationStatus result = await inmdiateAlert.characteristic.WriteValueAsync(writeBuffer);
-
-                 if (result == GattCommunicationStatus.Success)
-                 {
-                     //ok
-                 }
-                 else
-                 {
-                     //false
-                 }
-             }
-             catch (Exception ex) when ((uint)ex.HResult == 0x80650003 || (uint)ex.HResult == 0x80070005)
-             {
-
-             }
-         }*/
-        #endregion
         private async void CheckConnectionAsync()
         {
-            MessageScreen dialog = new MessageScreen("Connecting");
-            dialog.Show();
+            dialog.Show("Connecting ...");
             if (Deviceinfo.IsPaired==false)
-                    await Deviceinfo.DeviceInformation.Pairing.PairAsync();
+                    await Deviceinfo.DeviceInformation.Pairing.PairAsync(DevicePairingProtectionLevel.Encryption);
             BluetoothLEDevice bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(Deviceinfo.Id);
             GattDeviceServicesResult Gattservices = await bluetoothLeDevice.GetGattServicesAsync();
             BluetoothLEAttributeDisplay inmdiateAlert = null;
@@ -190,19 +151,20 @@ namespace Injectoclean.Tools.BLE
                 if ( result.Status == GattCommunicationStatus.Success)
                 {
                     dialog.set("Correct","Device Connection success", 1500);
-                    rootPage.Deviceinfo = Deviceinfo;
+
+                    DeviceInfo.Set(Deviceinfo);
                     this.Clear();
                 }
                 else
                 {
                     dialog.SetwithButton("Device Connection failed", "Please Reset CJ4 manually and try again", "Ok");
-                    rootPage.Deviceinfo = null;
+                    DeviceInfo.Set(null);
                     Deviceinfo = null;
                 }
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80650003 || (uint)ex.HResult == 0x80070005)
             {
-                rootPage.NotifyUser(ex.Message.ToString(), NotifyType.ErrorMessage);
+                log.LogMessageError(ex.Message.ToString());
                 dialog.SetwithButton("Device Connection failed", "This Program just works with a CJ4 with BLE Tecnology, please purchase with a Certified distributor", "Ok");
             }
             if (watcheron == true)
@@ -280,7 +242,7 @@ namespace Injectoclean.Tools.BLE
                 temp = bleDeviceDisplay.Id;
                 if (temp.Contains(id) == true)
                 {
-                    rootPage.NotifyUser("Device Finded,Please wait...", NotifyType.StatusMessage);
+                    log.LogMessageNotification("Device Finded,Please wait...");
                     return bleDeviceDisplay;
                 }
             }

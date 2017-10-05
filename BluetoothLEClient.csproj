@@ -99,9 +99,19 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Data\Ford\FordCarInfo.cs" />
-    <Compile Include="Tools\Data\Ford\FordData.cs" />
+    <Compile Include="Tools\BLE\ComunicationManager.cs" />
+    <Compile Include="Tools\BLE\IDeviceInfo.cs" />
+    <Compile Include="Tools\BLE\ILockScreen.cs" />
+    <Compile Include="Tools\BLE\ILog.cs" />
+    <Compile Include="Tools\BLE\SetupCJ4.cs" />
+    <Compile Include="Tools\Developers\DeviceInfo.cs" />
+    <Compile Include="Tools\Developers\Log.cs" />
+    <Compile Include="Tools\Ford\Data\CarID.cs" />
+    <Compile Include="Tools\Ford\Data\FordCarInfo.cs" />
+    <Compile Include="Tools\Ford\Data\FordData.cs" />
     <Compile Include="Tools\Data\Db_connectioncs.cs" />
+    <Compile Include="Tools\Ford\GenericVin\TrainInfo.cs" />
+    <Compile Include="Tools\Ford\GenericVin\VinComunication.cs" />
     <Compile Include="Tools\UserHelpers\MessageScreen.cs" />
     <Compile Include="Tools\BLE\Comunication.cs" />
     <Compile Include="Tools\BLE\Discover.cs" />

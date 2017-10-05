@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Injectoclean.Tools.Data.Ford
+namespace Injectoclean.Tools.Ford.Data
 {
     public class FordCarInfo
     {
@@ -31,20 +31,6 @@ namespace Injectoclean.Tools.Data.Ford
         public string Name { get => name; set => name = value; }
         public int Year { get => year; set => year = value; }
         public List<CarID> Carsid { get => carsid; set => carsid = value; }
-        
-        public class CarID
-        {
-            long id;
-            String type, subtype;       
-            public CarID(long id, string type, string subtype)
-            {
-                this.id = id;
-                this.type = type;
-                this.subtype = subtype;
-            }
-            public long Id { get => id; set => id = value; }
-            public string Type { get => type; set => type = value; }
-            public string Subtype { get => subtype; set => subtype = value; }
-        }
+       
     }
 }

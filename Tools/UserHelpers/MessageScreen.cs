@@ -1,29 +1,25 @@
-﻿using System;
+﻿using Injectoclean.Tools.BLE;
+using System;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 
 namespace Injectoclean.Tools.UserHelpers
 {
-    class MessageScreen
+    public class MessageScreen: ILockScreen
     {
         private ContentDialog dialog;
         private ProgressRing ring;
-        public  MessageScreen(String waitmessage)
-        { 
-            dialog = new ContentDialog
-            {
-                Title = waitmessage,
-            };
+        public MessageScreen()
+        {
+            dialog = new ContentDialog();
             ProgressRing ring = new ProgressRing();
             ring.IsActive = true;
             dialog.Content = ring;
         }
-        private MessageScreen()
+
+        public async void Show(String title)
         {
-            dialog = new ContentDialog();
-        }
-        public async void Show()
-        {
+            dialog.Title = title;
             await dialog.ShowAsync();
         }
         public void Close()
@@ -42,11 +38,11 @@ namespace Injectoclean.Tools.UserHelpers
             await PutTaskDelay(timeout);
             this.Close();
         }
-        public void SetwithButton(String title, String content, String CloseButton)
+        public void SetwithButton(String title, String content, String CloseButtonName)
         {
             dialog.Title = title;
             dialog.Content = content;
-            dialog.CloseButtonText = CloseButton;
+            dialog.CloseButtonText = CloseButtonName;
         }
         async Task PutTaskDelay(int time)
         {

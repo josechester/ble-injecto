@@ -1,64 +1,65 @@
-﻿using Injectoclean.Tools.BLE;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Injectoclean.Tools.UserHelpers;
 using static Injectoclean.Tools.BLE.GattAttributes.InmediateAlert;
 
-namespace Injectoclean.Tools.Developers
+namespace Injectoclean.Tools.BLE
 {
-    class RemoteShell: Comunication
+    public class SetupCJ4
     {
         private MainPage rootPage;
-        
+        private ComunicationManager comunication;
+        protected ILockScreen dialog;
         bool Error = false;
         int limit = 5;
-        private RemoteShell()
-        {
-        }
 
-        public RemoteShell(MainPage mainPage):base(new DeviceInfo(), new Log())
+        public SetupCJ4(ComunicationManager com, String program, ILockScreen dialog)
         {
-            this.rootPage = mainPage;
+            Task T=this.ExecuteSetup(program);
             
         }
-        public async void SetupCJ4()
+        private SetupCJ4()
+        {
+           
+
+        }
+        public async Task ExecuteSetup(String program) 
         {
 
             Error = false;
-            String program = "pass.cj4";
+            //String program = "pass.cj4";
             Byte[] arg = { (byte)0x00 };
-            MessageScreen dialog = new MessageScreen();
-            if (!base.isready)
+            if (!comunication.IsReady())
+
                 await PutTaskDelay(1000);
+
             dialog.Show("Restarting CJ4...");
-            await RestartCJ4();
+
+            Task t = comunication.SendCommand(Key.Reset);
+                
             dialog.setTitle("Accesing Remote Shell...");
             await RemoteShellAccess();
-            if (Error == true)
+            if (Error)
             {
                 dialog.SetwithButton("could'n conect to remote Shell", "Please use a update device to this function or if your device is up to day please contact support", "Ok");
                 return;
             }
             dialog.setTitle("Accesing Files...");
             await CdToFiles();
-            if (Error == true)
+            if (Error)
             {
                 dialog.SetwithButton("could'n conect to remote Shell", "Please use a update device to this function or if your device is up to day please contact support", "Ok");
                 return;
             }
             dialog.setTitle("Executing Program");
+
             await ExecuteFile(program);
-            if (Error == true)
+            if (Error)
+
                 dialog.SetwithButton("could'n execute program" + program, "Please use a update device to this function or if your device is up to day please contact support", "Ok");
             else
                 dialog.set("Sucess", "Program " + program + " is running", 1500);
-        }
-        private async Task RestartCJ4()
-        {
-            Task t=base.WriteInmediateAlert(Key.Reset);
-            await PutTaskDelay(3000);
         }
 
         private async Task RemoteShellAccess()
@@ -69,10 +70,9 @@ namespace Injectoclean.Tools.Developers
             int tries = 0;
             while (tries < limit && (response == null || response[response.Length - 1] != 88))
             {
-                base.sendrequest(command);
-                base.waitaresponse();
-                response = base.GetResponse();
-                await PutTaskDelay(1500);
+                await comunication.GetCall(command, 300, 1);
+                response = comunication.GetLastResponse();
+                //await PutTaskDelay(1500);
                 tries++;
             }
             if (tries == limit)
@@ -86,10 +86,8 @@ namespace Injectoclean.Tools.Developers
             int tries = 0;
             while (tries < limit && (response == null || response.Length < 5))
             {
-                base.sendrequest(command);
-                base.waitaresponse();
-                response = base.GetResponse();
-                await PutTaskDelay(1500);
+                await comunication.GetCall(command, 300, 1);
+                response = comunication.GetLastResponse();
                 tries++;
             }
             if (tries == limit)
@@ -104,15 +102,13 @@ namespace Injectoclean.Tools.Developers
             int tries = 0;
             while (tries < limit && !running)
             {
-                base.sendrequest(command);
-                base.waitaresponse();
-                response = base.GetResponse();
-                await PutTaskDelay(300);
+                await comunication.GetCall(command, 300, 1);
+                response = comunication.GetLastResponse();
                 if (response == null)
                 {
-                    base.WriteInmediateAlert(Key.Up);
-                    base.waitaresponse();
-                    response = base.GetResponse();
+                    await comunication.SendCommand(Key.Up);
+                    await comunication.waitresponses(300, 1);
+                    response = comunication.GetLastResponse();
                     if (response == null)
                         running = true;
                     break;
@@ -143,20 +139,7 @@ namespace Injectoclean.Tools.Developers
             command[command.Length - 1] = (byte)((int)command[0] + 1);
             return command;
         }
-        public void RemoteKey(Windows.Storage.Streams.IBuffer com)
-        {
-            base.WriteInmediateAlert(com);
-        }
-        public async Task SendCommand(Byte[] Command)
-        {
-            base.sendrequest(Command);
-            base.waitaresponse();
-            await PutTaskDelay(500);
-        }
-        public string getResponse()
-        {
-            return base.GetStringResponse();
-        }
+        
         public byte[] CommandBuilder(String line)
         {
 

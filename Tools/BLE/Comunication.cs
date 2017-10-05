@@ -1,60 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Security.Cryptography;
-//notes make just one class to allow use asyncronous metods
+
 namespace Injectoclean.Tools.BLE
 {
-    class Comunication
+    public class Comunication
     {
 
-        private List<BluetoothLEAttributeDisplay> ServiceCollection = new List<BluetoothLEAttributeDisplay>();
-        private List<BluetoothLEAttributeDisplay> Custom = new List<BluetoothLEAttributeDisplay>();
-        private List<BluetoothLEAttributeDisplay> InmediateAlert = new List<BluetoothLEAttributeDisplay>();
+        protected List<BluetoothLEAttributeDisplay> ServiceCollection = new List<BluetoothLEAttributeDisplay>();
+        protected List<BluetoothLEAttributeDisplay> Custom = new List<BluetoothLEAttributeDisplay>();
+        protected List<BluetoothLEAttributeDisplay> InmediateAlert = new List<BluetoothLEAttributeDisplay>();
 
-        private MainPage rootPage;
         private BluetoothLEDevice bluetoothLeDevice = null;
-        private GattCharacteristicsResult characteristics;
-        private bool isValueChangedHandlerRegistered = false;
-        private GattPresentationFormat presentationFormat;
-        public bool isready = false;
-
+        protected GattCharacteristicsResult characteristics;
+        protected bool isValueChangedHandlerRegistered = false;
+        protected bool isready = false;
         private Byte[] response;
-
-        public Byte[] getResponse()
+        private BluetoothLEDeviceDisplay Deviceinfo;
+        protected ILog Log;
+        protected Byte[] GetResponse()
         {
-            Byte[] temp = response;
+            
+            Byte[] temp=response;
             response = null;
             return temp;
         }
-        private Comunication() { }
-        public Comunication(MainPage rootpage)
-        {
-            this.rootPage = rootpage;
-            GetServices();
-            //presentationFormat.FormatType.ToString();
-        }
+        protected Byte[] Response() => response;
 
+        protected  Comunication()
+        {
+            Task t = GetServices();
+        }
+        protected Comunication(IDeviceInfo Deviceinfo,ILog Log)
+        {
+            this.Deviceinfo = Deviceinfo.Get(); 
+            this.Log = Log;
+            Task t=GetServices();
+        }
         #region getServices&Characteristics
-        private async void GetServices()
+        private async Task GetServices()
         {
             bluetoothLeDevice?.Dispose();
             bluetoothLeDevice = null;
 
-            bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(rootPage.Deviceinfo.Id);
+            bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(Deviceinfo.Id);
             GattDeviceServicesResult result = await bluetoothLeDevice.GetGattServicesAsync();
             int i = 0;
             foreach (GattDeviceService service in result.Services)
             {
-                getservices(service);
+               Task t= getservices(service);
                 i++;
             }
             i = 0;
             isready = true;
         }
-        private async void getservices(GattDeviceService service)
+        private async Task getservices(GattDeviceService service)
         {
             List<BluetoothLEAttributeDisplay> CharacteristicCollection = null;
             if (service.Uuid == GattAttributes.InmediateAlert.guid)
@@ -72,38 +76,37 @@ namespace Injectoclean.Tools.BLE
 
         }
         #endregion
-        public async void WriteInmediateAlert(Windows.Storage.Streams.IBuffer com)
+        protected async Task WriteInmediateAlert(Windows.Storage.Streams.IBuffer com)
         {
-
             try
             {
                 var result = await InmediateAlert.ElementAt(0).characteristic.WriteValueAsync(com);
                 if (!(result == GattCommunicationStatus.Success))
-                    rootPage.NotifyUser($"Write failed: {result}", NotifyType.ErrorMessage);
+                    Log.LogMessageError($"Write failed: {result}");
+                    
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80650003 || (uint)ex.HResult == 0x80070005)
             {
-                rootPage.NotifyUser(ex.Message, NotifyType.ErrorMessage);
+                Log.LogMessageError(ex.Message);
             }
-
+           
         }
-
-        public async void sendrequest(Byte[] message)
+        protected async Task sendrequest(Byte[] message)
         {
             try
             {
                 var result = await Custom.ElementAt(1).characteristic.WriteValueAsync(
                     CryptographicBuffer.CreateFromByteArray(message));
                 if (!(result == GattCommunicationStatus.Success))
-                    rootPage.NotifyUser($"Write failed: {result}", NotifyType.ErrorMessage);
+                    Log.LogMessageError($"Write failed: {result}");
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80650003 || (uint)ex.HResult == 0x80070005)
             {
-                rootPage.NotifyUser(ex.Message, NotifyType.ErrorMessage);
+                Log.LogMessageError(ex.Message);
             }
         }
 
-        public async void waitaresponse()
+        protected async Task waitaresponse()
         {
             try
             {
@@ -112,26 +115,22 @@ namespace Injectoclean.Tools.BLE
                 if (result == GattCommunicationStatus.Success)
                     AddValueChangedHandler();
                 else
-                    rootPage.NotifyUser($"Error getting notification: {result}", NotifyType.ErrorMessage);
+                    Log.LogMessageError($"Write failed: {result}");
             }
             catch (UnauthorizedAccessException ex)
             {
-                rootPage.NotifyUser(ex.Message, NotifyType.ErrorMessage);
+                Log.LogMessageError(ex.Message);
             }
         }
         #region ResponseHandlers
-        //private readonly CoreDispatcher dispatcher=new CoreDispatcher();
-        /*async //it was but works better lik that*/
         private void Characteristic_ValueChanged(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             if (args != null)
             {
                 CryptographicBuffer.CopyToByteArray(args.CharacteristicValue, out response);
-                RemoveValueChangedHandler(); //this is just for one response
             }
-
         }
-        private void RemoveValueChangedHandler()
+        protected void RemoveValueChangedHandler()
         {
             if (isValueChangedHandlerRegistered)
             {
@@ -139,7 +138,7 @@ namespace Injectoclean.Tools.BLE
                 isValueChangedHandlerRegistered = false;
             }
         }
-        private void AddValueChangedHandler()
+        protected void AddValueChangedHandler()
         {
             if (!isValueChangedHandlerRegistered)
             {
@@ -148,24 +147,10 @@ namespace Injectoclean.Tools.BLE
             }
         }
         #endregion
-
-        #region ResponseFormats
-        public String GetstringResponse()
+        
+        protected String GetStringResponse()
         {
-            String temp = "";
-            if (response == null)
-                return "Null";
-            for (int i = 0; i < response.Length; i++)
-            {
-                if (i == 0)
-                    temp += response[i].ToString("X2");
-                else
-                    temp += "-" + response[i].ToString("X2");
-            }
-            return temp;
-        }
-        private String GetstringFromBytes(Byte[] array)
-        {
+            Byte[] array = GetResponse();
             String temp = "";
             for (int i = 0; i < array.Length; i++)
             {
@@ -176,6 +161,6 @@ namespace Injectoclean.Tools.BLE
             }
             return temp;
         }
-        #endregion
+
     }
 }

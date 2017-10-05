@@ -12,7 +12,7 @@ namespace Injectoclean.Tools.BLE
     /// <summary>
     ///     Represents the display of an attribute - both characteristics and services.
     /// </summary>
-    public class BluetoothLEAttributeDisplay
+     public class BluetoothLEAttributeDisplay
     {
         public GattCharacteristic characteristic;
         public GattDescriptor descriptor;

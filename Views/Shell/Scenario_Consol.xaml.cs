@@ -1,10 +1,11 @@
-﻿using Injectoclean.Tools.Data;
+﻿using Injectoclean.Tools.Ford.Data;
 using Injectoclean.Tools.Developers;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Injectoclean.Tools.BLE;
 // La plantilla de elemento Página en blanco está documentada en https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Injectoclean
@@ -15,15 +16,14 @@ namespace Injectoclean
     public sealed partial class Scenario_Consol : Page
     {
         private MainPage rootPage;
-        RemoteShell comunication;
         private static AutoResetEvent resetEvent = new AutoResetEvent(false);
+        private SetupCJ4 setup;
         public Scenario_Consol()
         {
             
             InitializeComponent();
-            rootPage = MainPage.Current;
-            comunication = new RemoteShell(rootPage);
-            comunication.SetupCJ4();
+            setup = new SetupCJ4(MainPage.Current.Comunication, "pass.cj4", MainPage.Current.messageScreen);
+            
         }
 
         private async void Send_Click(object sender, RoutedEventArgs e)

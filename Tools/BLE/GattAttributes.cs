@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Windows.Storage.Streams;
 using Windows.Security.Cryptography;
 
 namespace Injectoclean.Tools.BLE
 {
-    static class GattAttributes
+    public class GattAttributes
     {
         public static class UknownService
         {
@@ -23,13 +20,13 @@ namespace Injectoclean.Tools.BLE
             public static readonly Guid Alertlevel = new Guid("00002a06-0000-1000-8000-00805f9b34fb");
             public static class Key
             {
-                public static readonly Windows.Storage.Streams.IBuffer Up = CryptographicBuffer.DecodeFromHexString("00");
-                public static readonly Windows.Storage.Streams.IBuffer Esc = CryptographicBuffer.DecodeFromHexString("01");
-                public static readonly Windows.Storage.Streams.IBuffer Left = CryptographicBuffer.DecodeFromHexString("02");
-                public static readonly Windows.Storage.Streams.IBuffer Enter = CryptographicBuffer.DecodeFromHexString("03");
-                public static readonly Windows.Storage.Streams.IBuffer Down = CryptographicBuffer.DecodeFromHexString("04");
-                public static readonly Windows.Storage.Streams.IBuffer Right = CryptographicBuffer.DecodeFromHexString("05");
-                public static readonly Windows.Storage.Streams.IBuffer Reset = CryptographicBuffer.DecodeFromHexString("06");
+                public static readonly IBuffer Up = CryptographicBuffer.DecodeFromHexString("00");
+                public static readonly IBuffer Esc = CryptographicBuffer.DecodeFromHexString("01");
+                public static readonly IBuffer Left = CryptographicBuffer.DecodeFromHexString("02");
+                public static readonly IBuffer Enter = CryptographicBuffer.DecodeFromHexString("03");
+                public static readonly IBuffer Down = CryptographicBuffer.DecodeFromHexString("04");
+                public static readonly IBuffer Right = CryptographicBuffer.DecodeFromHexString("05");
+                public static readonly IBuffer Reset = CryptographicBuffer.DecodeFromHexString("06");
 
             }
         }

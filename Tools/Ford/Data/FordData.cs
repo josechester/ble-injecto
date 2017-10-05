@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Injectoclean.Tools.Data;
+using System;
 using System.Collections.Generic;
 
-namespace Injectoclean.Tools.Data.Ford
+namespace Injectoclean.Tools.Ford.Data
 {
     public static class FordData
     {

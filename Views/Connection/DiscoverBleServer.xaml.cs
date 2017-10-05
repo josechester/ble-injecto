@@ -1,5 +1,7 @@
 
 using Injectoclean.Tools.BLE;
+using Injectoclean.Tools.Developers;
+using Injectoclean.Tools.UserHelpers;
 using System;
 using System.Collections.ObjectModel;
 using Windows.UI.Xaml;
@@ -19,7 +21,7 @@ namespace Injectoclean
         {
             InitializeComponent();
             ResultsListView.Header=
-            discover = new Discover(rootPage);
+            discover = new Discover(new DeviceInfo(),new Log(), new MessageScreen());
             bydevice.IsChecked = true;
         }
         private void EnumerateButton_Click(object sender, RoutedEventArgs e)

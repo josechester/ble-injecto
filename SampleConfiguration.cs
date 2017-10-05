@@ -1,5 +1,7 @@
 
 using Injectoclean.Tools.BLE;
+using Injectoclean.Tools.Developers;
+using Injectoclean.Tools.UserHelpers;
 using Injectoclean.Views.Shell;
 using System;
 using System.Collections.Generic;
@@ -20,10 +22,12 @@ namespace Injectoclean
            
 
          };
-        
-   
-        private BluetoothLEDeviceDisplay deviceinfo = null;
 
+        public Log Log = new Log();
+        public DeviceInfo iDeviceinfo = new DeviceInfo();
+        public MessageScreen messageScreen = new MessageScreen();
+        private BluetoothLEDeviceDisplay deviceinfo = null;
+        private ComunicationManager comunication;
         public BluetoothLEDeviceDisplay Deviceinfo
         {
             get
@@ -33,15 +37,12 @@ namespace Injectoclean
             set
             {
                 this.deviceinfo = value;
-            
-                //this.OnPropertyChanged();
+                comunication = new ComunicationManager(Log,iDeviceinfo);
             }
         }
-        /*private void OnPropertyChanged()
-        {
-            if (deviceinfo != null) { return; }
-                
-        }*/
+
+        public ComunicationManager Comunication { get => comunication;  }
+
         public class Scenario
         {
             public string Title { get; set; }
