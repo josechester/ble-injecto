@@ -39,10 +39,10 @@ namespace Injectoclean.Tools.BLE
         {
             this.Deviceinfo = Deviceinfo.Get(); 
             this.Log = Log;
-            Task t=GetServices();
+            
         }
         #region getServices&Characteristics
-        private async Task GetServices()
+        public async Task GetServices()
         {
             bluetoothLeDevice?.Dispose();
             bluetoothLeDevice = null;
@@ -52,7 +52,7 @@ namespace Injectoclean.Tools.BLE
             int i = 0;
             foreach (GattDeviceService service in result.Services)
             {
-               Task t= getservices(service);
+               await getservices(service);
                 i++;
             }
             i = 0;
@@ -108,6 +108,7 @@ namespace Injectoclean.Tools.BLE
 
         protected async Task waitaresponse()
         {
+            response = null;
             try
             {
                 var result = await Custom.ElementAt(0).characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(

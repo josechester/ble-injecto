@@ -99,6 +99,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="async.cs" />
     <Compile Include="Tools\BLE\ComunicationManager.cs" />
     <Compile Include="Tools\BLE\IDeviceInfo.cs" />
     <Compile Include="Tools\BLE\ILockScreen.cs" />

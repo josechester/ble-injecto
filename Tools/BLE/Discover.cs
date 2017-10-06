@@ -151,13 +151,13 @@ namespace Injectoclean.Tools.BLE
                 if ( result.Status == GattCommunicationStatus.Success)
                 {
                     dialog.set("Correct","Device Connection success", 1500);
-
-                    DeviceInfo.Set(Deviceinfo);
+                    DeviceInfo.SetandSetup(Deviceinfo);
                     this.Clear();
                 }
                 else
                 {
                     dialog.SetwithButton("Device Connection failed", "Please Reset CJ4 manually and try again", "Ok");
+                    dialog.Close();
                     DeviceInfo.Set(null);
                     Deviceinfo = null;
                 }

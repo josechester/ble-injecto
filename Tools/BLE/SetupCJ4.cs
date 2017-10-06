@@ -8,15 +8,16 @@ namespace Injectoclean.Tools.BLE
 {
     public class SetupCJ4
     {
-        private MainPage rootPage;
         private ComunicationManager comunication;
         protected ILockScreen dialog;
         bool Error = false;
         int limit = 5;
 
-        public SetupCJ4(ComunicationManager com, String program, ILockScreen dialog)
+        public SetupCJ4(ComunicationManager comunication, String program, ILockScreen dialog)
         {
-            Task T=this.ExecuteSetup(program);
+            this.dialog = dialog;
+            this.comunication = comunication;
+            this.ExecuteSetup(program);
             
         }
         private SetupCJ4()
@@ -31,13 +32,12 @@ namespace Injectoclean.Tools.BLE
             //String program = "pass.cj4";
             Byte[] arg = { (byte)0x00 };
             if (!comunication.IsReady())
-
                 await PutTaskDelay(1000);
 
             dialog.Show("Restarting CJ4...");
 
-            Task t = comunication.SendCommand(Key.Reset);
-                
+            await comunication.SendCommand(Key.Reset);
+            await PutTaskDelay(1000);
             dialog.setTitle("Accesing Remote Shell...");
             await RemoteShellAccess();
             if (Error)
@@ -68,11 +68,17 @@ namespace Injectoclean.Tools.BLE
             Byte[] command = CommandBuilder(arg, (byte)0x00);
             Byte[] response = null;
             int tries = 0;
-            while (tries < limit && (response == null || response[response.Length - 1] != 88))
+            while (tries < limit )
             {
-                await comunication.GetCall(command, 300, 1);
+                await comunication.GetCall(command, 500, 1);
                 response = comunication.GetLastResponse();
                 //await PutTaskDelay(1500);
+                if (response != null)
+                {
+                    dialog.setTitle(comunication.GetstringFromBytes(response));
+                    if (response[response.Length - 1] == 88)
+                        tries = limit + 1;
+                }
                 tries++;
             }
             if (tries == limit)

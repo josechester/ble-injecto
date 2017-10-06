@@ -10,5 +10,10 @@ namespace Injectoclean.Tools.Developers
         {
             Current.Deviceinfo = DeviceInfo;
         }
+        public void SetandSetup(BluetoothLEDeviceDisplay DeviceInfo)
+        {
+            Current.Deviceinfo = DeviceInfo;
+            Current.GetServices();
+        }
     }
 }

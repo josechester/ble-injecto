@@ -10,13 +10,18 @@ namespace Injectoclean.Tools.BLE
         private List<Byte[]> responses=null;
         public ComunicationManager(ILog Log,IDeviceInfo deviceInfo) : base(deviceInfo,Log)
         {
-            
+            responses = new List<Byte[]>();
         }
 
         public List<Byte[]> GetResponses() => responses;
-       
+
         #region ResponseFormats
-        public Byte[] GetLastResponse() => responses.Last();
+        public Byte[] GetLastResponse()
+        {
+            if(responses.Count==0)
+                return null;
+            return responses.Last(); ;
+        }
 
         public String GetstringFromBytes(Byte[] array)
         {
@@ -47,15 +52,22 @@ namespace Injectoclean.Tools.BLE
 
         public async Task waitresponses(int time, int nresponses)
         {
+           
             responses.Clear();
             int timeout = time;
-            while (timeout > 0 && responses.Count< nresponses)
+            while (timeout > 0)
             {
                 await PutTaskDelay(10);
                 timeout -= 10;
                 if (base.Response() != null)
+                {
                     responses.Add(base.GetResponse());
+                    if(responses.Count == nresponses)
+                        timeout = 0;
+                }
+                    
             }
+            RemoveValueChangedHandler();
         }
         private async Task PutTaskDelay(int time)
         {

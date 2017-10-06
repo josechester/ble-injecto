@@ -12,13 +12,14 @@ namespace Injectoclean.Tools.UserHelpers
         public MessageScreen()
         {
             dialog = new ContentDialog();
-            ProgressRing ring = new ProgressRing();
+            ring = new ProgressRing();
             ring.IsActive = true;
             dialog.Content = ring;
         }
 
         public async void Show(String title)
         {
+            dialog.Hide();
             dialog.Title = title;
             await dialog.ShowAsync();
         }

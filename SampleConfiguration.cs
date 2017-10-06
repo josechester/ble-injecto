@@ -5,6 +5,7 @@ using Injectoclean.Tools.UserHelpers;
 using Injectoclean.Views.Shell;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 
 namespace Injectoclean
@@ -37,10 +38,18 @@ namespace Injectoclean
             set
             {
                 this.deviceinfo = value;
-                comunication = new ComunicationManager(Log,iDeviceinfo);
             }
         }
 
+        public async Task GetServices()
+        {
+            comunication = new ComunicationManager(Log, iDeviceinfo);
+            await Task.Delay(1505);
+            messageScreen = new MessageScreen();
+            messageScreen.Show("Setup Services ...");
+            await comunication.GetServices();
+            messageScreen.Close();
+        } 
         public ComunicationManager Comunication { get => comunication;  }
 
         public class Scenario

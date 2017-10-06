@@ -4,5 +4,6 @@
     {
         BluetoothLEDeviceDisplay Get();
         void Set(BluetoothLEDeviceDisplay DeviceInfo);
+        void SetandSetup(BluetoothLEDeviceDisplay DeviceInfo);
     }
 }

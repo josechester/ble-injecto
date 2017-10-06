@@ -6,6 +6,7 @@ using System.Threading;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Injectoclean.Tools.BLE;
+using Injectoclean.Tools.UserHelpers;
 // La plantilla de elemento Página en blanco está documentada en https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Injectoclean
