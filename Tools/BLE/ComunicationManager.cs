@@ -62,14 +62,14 @@ namespace Injectoclean.Tools.BLE
                 if (base.Response() != null)
                 {
                     responses.Add(base.GetResponse());
-                    if(responses.Count == nresponses)
+                    if(nresponses!=0  && responses.Count == nresponses)
                         timeout = 0;
                 }
                     
             }
             RemoveValueChangedHandler();
         }
-        private async Task PutTaskDelay(int time)
+        protected async Task PutTaskDelay(int time)
         {
             await Task.Delay(time);
         }
