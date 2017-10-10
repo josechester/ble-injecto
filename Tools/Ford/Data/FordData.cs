@@ -18,5 +18,11 @@ namespace Injectoclean.Tools.Ford.Data
             String query = "";
             return new Db_connection("dbFordVinGeneric.db").consult(query, 1);
         }
+        public static FordCarInfo getFordCarInfo(VinInfo vinInfo)
+        {
+
+            String query = "";
+            return new FordCarInfo(null, null, 0, null, null,null,null,null);
+        }
     }
 }

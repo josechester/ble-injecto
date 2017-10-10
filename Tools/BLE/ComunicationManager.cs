@@ -7,22 +7,17 @@ namespace Injectoclean.Tools.BLE
 {
     public class ComunicationManager : Comunication
     {
-        private List<Byte[]> responses=null;
-        public ComunicationManager(ILog Log,IDeviceInfo deviceInfo) : base(deviceInfo,Log)
-        {
-            responses = new List<Byte[]>();
-        }
 
-        public List<Byte[]> GetResponses() => responses;
+        public ComunicationManager(ILog Log, IDeviceInfo deviceInfo) : base(deviceInfo, Log)
+        {
+        }
+        public void init()
+        {
+            Task t = base.GetServices();
+            //t.Wait();
+        }
 
         #region ResponseFormats
-        public Byte[] GetLastResponse()
-        {
-            if(responses.Count==0)
-                return null;
-            return responses.Last(); ;
-        }
-
         public String GetstringFromBytes(Byte[] array)
         {
             String temp = "";
@@ -37,41 +32,64 @@ namespace Injectoclean.Tools.BLE
         }
         public bool IsReady() => base.isready;
         #endregion
-        public async Task SendCommand(Windows.Storage.Streams.IBuffer com)
+        public void SendCommand(Windows.Storage.Streams.IBuffer com)
         {
-            await base.WriteInmediateAlert(com);
+            Task t = base.WriteInmediateAlert(com);
         }
-        
-        public async Task GetCall(Byte[] message, int timeout,int NumMessages)
+
+        public Byte[][] GetResponses(Byte[] message, int timeout, int NumMessages)
         {
-            await base.sendrequest(message);
-            await base.waitaresponse();
-            await this.waitresponses(timeout, NumMessages);
+            Task t = base.sendrequest(message);
+            return GetResponses(timeout, NumMessages);
+        }
+
+        public Byte[] GetLastResponse(Byte[] message, int timeout, int NumMessages)
+        {
+            Byte[][] responses = GetResponses(message, timeout, NumMessages);
+            if (responses == null)
+                return null;
+            if (responses.Length == 0)
+                return null;
+            return responses.Last();
         }
 
 
-        public async Task waitresponses(int time, int nresponses)
+        public Byte[] GetLastResponse(int timeout,int nresponses)
         {
-           
-            responses.Clear();
+            Byte[][] responses = GetResponses(timeout, nresponses);
+            if (responses == null)
+                return null;
+            if (responses.Length == 0)
+                return null;
+            return responses.Last();
+        }
+        public Byte[][] GetResponses(int time, int nresponses)
+        {
+            Task t = waitaresponse();
+      
+            List<Byte[]> responses = new List<Byte[]>();
             int timeout = time;
             while (timeout > 0)
             {
-                await PutTaskDelay(10);
+                PutTaskDelay(10);
                 timeout -= 10;
                 if (base.Response() != null)
                 {
                     responses.Add(base.GetResponse());
-                    if(nresponses!=0  && responses.Count == nresponses)
+                    if (nresponses != 0 && responses.Count == nresponses)
                         timeout = 0;
                 }
-                    
+
             }
             RemoveValueChangedHandler();
+            if (responses.Count == 0)
+                return null;
+            return responses.ToArray();
         }
-        protected async Task PutTaskDelay(int time)
+        public static void PutTaskDelay(int time)
         {
-            await Task.Delay(time);
+            Task t=Task.Delay(time);
+            t.Wait();
         }
     }
 

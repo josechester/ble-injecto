@@ -17,7 +17,7 @@ namespace Injectoclean.Tools.BLE
         {
             this.dialog = dialog;
             this.comunication = comunication;
-            this.ExecuteSetup(program);
+            ExecuteSetup(program);
             
         }
         private SetupCJ4()
@@ -25,28 +25,27 @@ namespace Injectoclean.Tools.BLE
            
 
         }
-        public async Task ExecuteSetup(String program) 
+        public async void ExecuteSetup(String program) 
         {
-
+            dialog.Show("Restarting CJ4...");
+            await Task.Delay(1);
             Error = false;
             //String program = "pass.cj4";
             Byte[] arg = { (byte)0x00 };
             if (!comunication.IsReady())
-                await PutTaskDelay(1000);
-
-            dialog.Show("Restarting CJ4...");
-
-            await comunication.SendCommand(Key.Reset);
-            await PutTaskDelay(1000);
+                ComunicationManager.PutTaskDelay(1000);
+            comunication.SendCommand(Key.Reset);
+            ComunicationManager.PutTaskDelay(1000);
+            //await Task.Delay(1000);
             dialog.setTitle("Accesing Remote Shell...");
-            await RemoteShellAccess();
+            RemoteShellAccess();
             if (Error)
             {
                 dialog.SetwithButton("could'n conect to remote Shell", "Please use a update device to this function or if your device is up to day please contact support", "Ok");
                 return;
             }
             dialog.setTitle("Accesing Files...");
-            await CdToFiles();
+            CdToFiles();
             if (Error)
             {
                 dialog.SetwithButton("could'n conect to remote Shell", "Please use a update device to this function or if your device is up to day please contact support", "Ok");
@@ -54,7 +53,7 @@ namespace Injectoclean.Tools.BLE
             }
             dialog.setTitle("Executing Program");
 
-            await ExecuteFile(program);
+            ExecuteFile(program);
             if (Error)
 
                 dialog.SetwithButton("could'n execute program" + program, "Please use a update device to this function or if your device is up to day please contact support", "Ok");
@@ -62,7 +61,7 @@ namespace Injectoclean.Tools.BLE
                 dialog.set("Sucess", "Program " + program + " is running", 1500);
         }
 
-        private async Task RemoteShellAccess()
+        private void RemoteShellAccess()
         {
             Byte[] arg = { (byte)0x00 };
             Byte[] command = CommandBuilder(arg, (byte)0x00);
@@ -70,21 +69,20 @@ namespace Injectoclean.Tools.BLE
             int tries = 0;
             while (tries < limit )
             {
-                await comunication.GetCall(command, 500, 1);
-                response = comunication.GetLastResponse();
+                //crear get last on comunicationmanager response
+                response = comunication.GetLastResponse(command, 500, 1);
                 //await PutTaskDelay(1500);
                 if (response != null)
                 {
-                    dialog.setTitle(comunication.GetstringFromBytes(response));
                     if (response[response.Length - 1] == 88)
-                        tries = limit + 1;
+                        return;
                 }
                 tries++;
             }
-            if (tries == limit)
+            if (tries == limit+1)
                 Error = true;
         }
-        private async Task CdToFiles()
+        private void CdToFiles()
         {
             Byte[] arg = { (byte)0x00 };
             Byte[] response = null;
@@ -92,15 +90,14 @@ namespace Injectoclean.Tools.BLE
             int tries = 0;
             while (tries < limit && (response == null || response.Length < 5))
             {
-                await comunication.GetCall(command, 300, 1);
-                response = comunication.GetLastResponse();
+                response = comunication.GetLastResponse(command, 300, 1);
                 tries++;
             }
-            if (tries == limit)
+            if (tries == limit+1)
                 Error = true;
 
         }
-        private async Task ExecuteFile(String program)
+        private void ExecuteFile(String program)
         {
             Byte[] response = null;
             Byte[] command = CommandBuilder(Encoding.ASCII.GetBytes(program + " "), (byte)0x0b);
@@ -108,13 +105,11 @@ namespace Injectoclean.Tools.BLE
             int tries = 0;
             while (tries < limit && !running)
             {
-                await comunication.GetCall(command, 300, 1);
-                response = comunication.GetLastResponse();
+                response = comunication.GetLastResponse(command, 300, 1);
                 if (response == null)
                 {
-                    await comunication.SendCommand(Key.Up);
-                    await comunication.waitresponses(300, 1);
-                    response = comunication.GetLastResponse();
+                    comunication.SendCommand(Key.Up);
+                    response = comunication.GetLastResponse(300,1);
                     if (response == null)
                         running = true;
                     break;
@@ -125,10 +120,6 @@ namespace Injectoclean.Tools.BLE
             if (!running)
                 Error = true;
 
-        }
-        async Task PutTaskDelay(int time)
-        {
-            await Task.Delay(time);
         }
         private static byte[] CommandBuilder(byte[] arg, byte modeForCd)
         {

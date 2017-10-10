@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Injectoclean.Tools.Ford.GenericVin
 {
-    public static class TrainInfo
+    public class TrainInfo
     {
         public static Byte[] _mode01 = new Byte[] { 0x80, 0x00, 0x05, 0x00, 0x6a, 0xf1, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
         public static Byte[] _mode02 = new Byte[] { 0x80, 0x00, 0x06, 0x00, 0x6a, 0xf1, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -35,7 +35,7 @@ namespace Injectoclean.Tools.Ford.GenericVin
         public static Byte[] _ResetPWMFilter = new Byte[] { 0x80, 0xf3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
         public static Byte[] _ISO14230Init = new Byte[] { 0x80, 0x00, 0x04, 0xc1, 0x33, 0xf1, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-
+        public static Byte[][] ResetCommands = new Byte[][]{ _ResetFlowControl, _ResetCANMaskAndFilter, _ResetVPWMask,_ResetVPWFilter, _ResetPWMMask, _ResetPWMFilter };
         public const Byte NONE = 0x00;
         public const Byte J1850PWM = 0x01;
         public const Byte J1850VPW = 0x02;
@@ -55,9 +55,9 @@ namespace Injectoclean.Tools.Ford.GenericVin
         public const Byte ISO15765_250_11 = (ISO15765 | CAN_250_11_GENERIC);
         public const Byte ISO15765_250_29 = (ISO15765 | CAN_250_29_GENERIC);
 
-        public static Byte Mode01Parameters;
-        public static Byte Mode01NumParameters;
-        public static Byte Mode02Parameters;
-        public static Byte Mode02NumParameters;
+        protected static Byte Mode01Parameters;
+        protected static Byte Mode01NumParameters;
+        protected static Byte Mode02Parameters;
+        protected static Byte Mode02NumParameters;
     }
 }

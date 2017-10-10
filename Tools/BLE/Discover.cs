@@ -60,7 +60,8 @@ namespace Injectoclean.Tools.BLE
         public void Getnearlydevices(ref ObservableCollection<BluetoothLEDeviceDisplay> ResultCollection)
         {
             this.Clear();
-            log.LogMessageNotification("");
+            if(log!=null)
+                log.LogMessageNotification("");
             this.ResultCollection = ResultCollection;
             ResultCollection.Clear();
             findbyid = false;
@@ -70,7 +71,8 @@ namespace Injectoclean.Tools.BLE
         public void GetService(String id)
         {
             Clear();
-            log.LogMessageNotification("");
+            if (log != null)
+                log.LogMessageNotification("");
             ResultCollection = new ObservableCollection<BluetoothLEDeviceDisplay>();
             findbyid = true;
             char[] a = id.ToCharArray();
@@ -106,7 +108,10 @@ namespace Injectoclean.Tools.BLE
 
             Clear();
             if (deviceinfo == null)
-                log.LogMessageError("Exeption DeviceInfo is null");
+            {
+                if (log != null)
+                    log.LogMessageError("Exeption DeviceInfo is null");
+            }
             else
             {
                 Deviceinfo = deviceinfo;
@@ -116,9 +121,24 @@ namespace Injectoclean.Tools.BLE
 
         private async void CheckConnectionAsync()
         {
+            DevicePairingResult results;
             dialog.Show("Connecting ...");
-            if (Deviceinfo.IsPaired==false)
-                    await Deviceinfo.DeviceInformation.Pairing.PairAsync(DevicePairingProtectionLevel.Encryption);
+            if (Deviceinfo.IsPaired == false)
+            {
+                results = await Deviceinfo.DeviceInformation.Pairing.PairAsync(DevicePairingProtectionLevel.Encryption);
+                if (results.Status != DevicePairingResultStatus.Paired && results.Status != DevicePairingResultStatus.AlreadyPaired)
+                {
+                    if (log != null)
+                        log.LogMessage("Paiting result: " + results.Status.ToString());
+                        dialog.SetwithButton("Device Connection failed", "Problem: "+results.Status.ToString(), "Ok");
+                    DeviceInfo.Set(null);
+                    Deviceinfo = null;
+                    this.Clear();
+
+                }
+            }
+                
+            
             BluetoothLEDevice bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(Deviceinfo.Id);
             GattDeviceServicesResult Gattservices = await bluetoothLeDevice.GetGattServicesAsync();
             BluetoothLEAttributeDisplay inmdiateAlert = null;
@@ -142,6 +162,9 @@ namespace Injectoclean.Tools.BLE
             if (inmdiateAlert == null)
             {
                 dialog.SetwithButton("Device Connection failed", "This Program just works with a CJ4, please purchase with a Certified distributor", "Ok");
+                this.Clear();
+                DeviceInfo.Set(null);
+                Deviceinfo = null;
                 return;
             }
             try
@@ -151,21 +174,27 @@ namespace Injectoclean.Tools.BLE
                 if ( result.Status == GattCommunicationStatus.Success)
                 {
                     dialog.set("Correct","Device Connection success", 1500);
+                    //t.Wait();
+                    ComunicationManager.PutTaskDelay(1500);
+                    dialog.Close();
                     DeviceInfo.SetandSetup(Deviceinfo);
                     this.Clear();
                 }
                 else
                 {
                     dialog.SetwithButton("Device Connection failed", "Please Reset CJ4 manually and try again", "Ok");
-                    dialog.Close();
+                    
                     DeviceInfo.Set(null);
                     Deviceinfo = null;
                 }
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80650003 || (uint)ex.HResult == 0x80070005)
             {
-                log.LogMessageError(ex.Message.ToString());
+                if (log != null)
+                    log.LogMessageError(ex.Message.ToString());
                 dialog.SetwithButton("Device Connection failed", "This Program just works with a CJ4 with BLE Tecnology, please purchase with a Certified distributor", "Ok");
+                DeviceInfo.Set(null);
+                Deviceinfo = null;
             }
             if (watcheron == true)
             {
@@ -242,7 +271,8 @@ namespace Injectoclean.Tools.BLE
                 temp = bleDeviceDisplay.Id;
                 if (temp.Contains(id) == true)
                 {
-                    log.LogMessageNotification("Device Finded,Please wait...");
+                    if (log != null)
+                        log.LogMessageNotification("Device Finded,Please wait...");
                     return bleDeviceDisplay;
                 }
             }

@@ -1,22 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Injectoclean.Tools.Ford.GenericVin;
 using Injectoclean.Tools.BLE;
 
 namespace Injectoclean.Tools.Ford.GenericVin
 {
     class VinComunication
     {
-        int address;
-        int address2;
-        bool readAllAddress; // aun no estoy seguro si tengo que traer otros metodos donde se pone en false o true
-        bool receivedTwo;
+        private int address;
+        private int address2;
+        private bool readAllAddress; // aun no estoy seguro si tengo que traer otros metodos donde se pone en false o true
+        private bool receivedTwo;
         public static int lastPID;
-        Byte[] inputGlobalNew;
-        ComunicationManager comunication;
+        private Byte[] inputGlobalNew;
+        private ComunicationManager comunication;
 
         private VinComunication()
         {}
@@ -25,7 +20,11 @@ namespace Injectoclean.Tools.Ford.GenericVin
             this.comunication = comunication;
             receivedTwo = false;
         }
-       
+        private static void LogError(ILog log, String message)
+        {
+            if (log != null)
+                log.LogMessageError(message);
+        }
         public Byte[] sendAndReceiveMessage(Byte[] output, int numResponses, bool detect, int protocol) 
         {
           
@@ -67,16 +66,15 @@ namespace Injectoclean.Tools.Ford.GenericVin
             for (int i = 0; i< 3; i++)
             {
             input = null;
-                Task.Delay(30);
-                Task t=comunication.GetCall(output,500,1);
-            input = comunication.GetLastResponse();
+                 ComunicationManager.PutTaskDelay(30);
+                input = comunication.GetLastResponse(output, 500, 1);
                 if (input!=null && input[1] != 0x00 && input[1] != 0x80 && input[1] == output[1])
                 {
-                    /*throw new ComnException("")*/;
+                    comunication.LogError("");
                 }
             }
-            //if (input == null)
-                //throw new ComnException("");
+            if (input == null)
+                comunication.LogError("");
             return input;
         }
 
@@ -93,16 +91,12 @@ namespace Injectoclean.Tools.Ford.GenericVin
 
             for (int i = 0; i < 12; i++)
             {
-
-                Task t = comunication.GetCall(output, time, 1);
-                input = comunication.GetLastResponse();
+                input = comunication.GetLastResponse(output, time, 1);
                 if (input[1] != 0x00 && input[1] != 0x80 && input[2] == 0x41 && input[3] == 0x6b)
-                {
-                    //throw new ComnException("");
-                }
+                    comunication.LogError("");
             }
-                if (input == null){ }
-                //throw new ComnException("");
+                if (input == null)
+                    comunication.LogError("");
             return input;
         }
 
@@ -117,10 +111,13 @@ namespace Injectoclean.Tools.Ford.GenericVin
                 error_count = 0;
                 num = 0;
                 offset = 0;
-                Task t=comunication.GetCall(output,400,1);
-                input = comunication.GetLastResponse();
-                t = comunication.waitresponses(400, 0);
-                List<Byte[]> response = comunication.GetResponses();
+                input = comunication.GetLastResponse(output, 400, 1);
+                Byte[][] response = comunication.GetResponses(400, 0);
+                int j = 0;
+                if (response != null)
+                    j = response.Length;
+                else
+                    comunication.LogError("response is null");
                 do
                 {
                     //validar si se recibio un tren valido
@@ -144,20 +141,22 @@ namespace Injectoclean.Tools.Ford.GenericVin
                             else
                             {
                                 offset += 14;
-                                if (++num >= numResponses) { }// throw new ComnException("");
+                                if (++num >= numResponses)
+                                    comunication.LogError("");
                             }
 
                         }
 
                     }
-                    ret = response.Last().Length;
-                    response.RemoveAt(response.Count);
-                } while (error_count < 3 && ret == 14);
+                    ret = response[j].Length;
+                    
+                } while (j>=0 && error_count < 3 && ret == 14);
 
-                if (error_count < 3 && detect == true) { }//throw new ComnException("");
+                if (error_count < 3 && detect == true)
+                    comunication.LogError("");
             }
             if (input == null)
-            { }// throw new ComnException("");
+                comunication.LogError("");
 
             return input;
         }
@@ -177,9 +176,8 @@ namespace Injectoclean.Tools.Ford.GenericVin
                 offset = 0;
                 ret = 0;
                 if (brand == 0x01)
-                    Task.Delay(4000);
-                Task t=comunication.GetCall(output,400,1);
-                input = comunication.GetLastResponse();
+                     ComunicationManager.PutTaskDelay(4000);
+                input = comunication.GetLastResponse(output, 400, 1);
                 do
                 {
                     //validar si se recibio un tren valido de la pila
@@ -201,19 +199,20 @@ namespace Injectoclean.Tools.Ford.GenericVin
                             else
                             {
                                 offset += 14;
-                                if (++num >= numResponses) { }// throw new ComnException("");
+                                if (++num >= numResponses)
+                                    comunication.LogError("");
                             }
                         }
                     }
-                    t = comunication.waitresponses(400, 1);
-                    ret = comunication.GetLastResponse().Length;
+                    ret = comunication.GetLastResponse(400,1).Length;
                    
                 } while (ret == 14);
 
-                if (brand != 0x01 && detect == true) { }//throw new ComnException("");
+                if (brand != 0x01 && detect == true)
+                    comunication.LogError("");
                 brand = 0x10;
-                if (input == null) { }
-                  //  throw new ComnException("Error");
+                if (input == null)
+                    comunication.LogError("");
                 return input;
             }
             return input;
@@ -234,9 +233,9 @@ namespace Injectoclean.Tools.Ford.GenericVin
             int time = 0;
             if (detect == true)
                 address2 = 0xFF;
-            for(int i = 0; i< 4; i++)
+            for (int i = 0; i < 4; i++)
             {
-                for(intentos = 0; intentos< 2; intentos++)
+                for (intentos = 0; intentos < 2; intentos++)
                 {
                     switch (intentos)
                     {
@@ -247,125 +246,126 @@ namespace Injectoclean.Tools.Ford.GenericVin
                             temp = TrainInfo._ISO14230Init;
                             break;
                     }
-                    if(TrainInfo._ISO14230Init[1] == 0x85 && intentos == 1)  //iif response init
+                    if (TrainInfo._ISO14230Init[1] == 0x85 && intentos == 1)  //iif response init
                     {
-                        Task.Delay(4000);
+                         ComunicationManager.PutTaskDelay(4000);
                         time = 3500;
                     }
                     else
-                    {                       
+                    {
                         if (readAllAddress)
                             time = 3000;
                         else
                             time = 1000;
 
-                    }
-                    Task t = comunication.GetCall(output, time, 1);
-                    input = comunication.GetLastResponse();
-                    if (time < 3500)
-                    {
-                        bytes_received = input.Length;
-                        if (bytes_received < 14)
-                            continue;
-                    }
-               
-                    if (input[0] == 0x40 && input[1] == 0x01 && (intentos==0))
-                    {
-                    
-                        if(input[1] != 0x80)
+
+                        input = comunication.GetLastResponse(output, time, 1);
+                        if (time < 3500)
                         {
-                            if(detect == true)
+                            bytes_received = input.Length;
+                            if (bytes_received < 14)
+                                continue;
+                        }
+
+                        if (input[0] == 0x40 && input[1] == 0x01 && (intentos == 0))
+                        {
+
+                            if (input[1] != 0x80)
                             {
-                                if (bytes_received >25)
+                                if (detect == true)
                                 {
-                                    val_input1 = input[4] & 0x0f;
-                                    val_input2 = input[14 + 4] & 0x0f;
-                                    if(val_input1<val_input2)
-                                        address2 = input[4];
+                                    if (bytes_received > 25)
+                                    {
+                                        val_input1 = input[4] & 0x0f;
+                                        val_input2 = input[14 + 4] & 0x0f;
+                                        if (val_input1 < val_input2)
+                                            address2 = input[4];
+                                        else
+                                        {
+                                            address2 = input[14 + 4];
+                                            for (ciclo = 0; ciclo < 14; ciclo++)
+                                                input[0 + ciclo] = input[14 + ciclo];
+                                        }
+                                        receivedTwo = true;
+                                    }
                                     else
                                     {
-                                        address2 = input[14 + 4];
-                                        for (ciclo=0;ciclo<14;ciclo++)
-                                            input[0 + ciclo] = input[14 + ciclo];            
+                                        if (bytes_received == 14)
+                                            address2 = input[4];
                                     }
-                                    receivedTwo = true;
                                 }
                                 else
                                 {
-                                    if (bytes_received == 14)
-                                        address2 = input[4];
-                                }
-                            }
-                            else
-                            {
-                                if(readAllAddress == false)
-                                {
-                                    if (receivedTwo == true && address2 != input[4])
+                                    if (readAllAddress == false)
                                     {
-                                        for (ciclo = 0; ciclo < 14; ciclo++)
-                                            input[0 + ciclo] = input[14 + ciclo];
-                                    }   
-                                }
-                                else
-                                {
-                                    offset=0;
-                                    counts = 0;
-                                    Byte container = input[0];
-                                    input= Enumerable.Repeat<Byte>(0, 199).ToArray();
-                                    input[0] = container;
-                                    do
-                                    {
-                                        if(counts>198)break;
-                                        if(input[0 + offset] != 0x40)break;
-                                        if (input[offset + 4] == address2 && input[offset + 5] != 0x7f)
+                                        if (receivedTwo == true && address2 != input[4])
                                         {
-                                            for (ciclo=0; ciclo<14;ciclo++)
-                                                input2[counts++] = input[offset + ciclo];
+                                            for (ciclo = 0; ciclo < 14; ciclo++)
+                                                input[0 + ciclo] = input[14 + ciclo];
                                         }
-                                        offset+=14;
                                     }
-                                    while (input[1 + offset] != 0x80);
+                                    else
+                                    {
+                                        offset = 0;
+                                        counts = 0;
+                                        Byte container = input[0];
+                                        
+                                        ArrayExtensions.Fill<Byte>(input, 0,0,199);
+                                        input[0] = container;
+                                        do
+                                        {
+                                            if (counts > 198) break;
+                                            if (input[0 + offset] != 0x40) break;
+                                            if (input[offset + 4] == address2 && input[offset + 5] != 0x7f)
+                                            {
+                                                for (ciclo = 0; ciclo < 14; ciclo++)
+                                                    input2[counts++] = input[offset + ciclo];
+                                            }
+                                            offset += 14;
+                                        }
+                                        while (input[1 + offset] != 0x80);
 
-                                    for (ciclo=0;ciclo<counts;ciclo++)//era 200
-                                        input[ciclo] = input2[ciclo];
-                                    //throw new ComnException("");
+                                        for (ciclo = 0; ciclo < counts; ciclo++)//era 200
+                                            input[ciclo] = input2[ciclo];
+                                        comunication.LogError("");
+
+                                    }
 
                                 }
-
+                                if (!validateChecksum(input, 13))
+                                    comunication.LogError("");
                             }
-                            if (!validateChecksum(input, 13))
-                            { }//throw new ComnException("");
+                        }
+                        else
+                        {
+                            if (TrainInfo._ISO14230Init[1] == 0x85)
+                                 ComunicationManager.PutTaskDelay(50);
                         }
                     }
-                    else
-                    {
-                        if (TrainInfo._ISO14230Init[1] == 0x85)
-                            Task.Delay(50);
-                    }
                 }
+                if (input == null)
+                    comunication.LogError("");
+                return input;
             }
-            if (input == null)
-            { }//  throw new ComnException("");
-            return input;
+            return null;
         }
         private Byte[] ISO15765SendAndReceiveMessage(Byte[] output, int numResponses, bool detect)
         {
             Byte[] input = null;
             for(int i = 0; i < 3; i++)
             {
-                Task t = comunication.GetCall(output, 400, 1);
-                input = comunication.GetLastResponse();
+                input = comunication.GetLastResponse(output,400,1);
                
                 if (input[1] == 0xa8 || input[1] == 0xa9)
                 {
                      if (input[7] == 0x7f) { }
-                        //throw new ComnException("");
+                        comunication.LogError("");
                     return input;
                 }
-                Task.Delay(250);
+                 ComunicationManager.PutTaskDelay(250);
             }
            if (input == null) { }
-                //throw new ComnException("");
+                comunication.LogError("");
             return input;
         }
 
@@ -381,7 +381,7 @@ namespace Injectoclean.Tools.Ford.GenericVin
                 return false;
         }
 
-        Byte[] genericMode01(int PID, int protocol)
+        public Byte[] genericMode01(int PID, int protocol)
         {
             readAllAddress = false;
 
@@ -400,7 +400,7 @@ namespace Injectoclean.Tools.Ford.GenericVin
             }
         }
 
-        Byte[] genericMode09(int SID, int protocol)
+        public Byte[] genericMode09(int SID, int protocol)
         {
             readAllAddress = false;
 
@@ -418,7 +418,7 @@ namespace Injectoclean.Tools.Ford.GenericVin
             }
         }
 
-        Byte[] genericModefd(int SID)
+        public Byte[] genericModefd(int SID)
         {
             readAllAddress = false;
             

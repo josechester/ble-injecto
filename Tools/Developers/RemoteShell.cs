@@ -14,10 +14,6 @@ namespace Injectoclean.Tools.Developers
         
         bool Error = false;
         int limit = 5;
-        private RemoteShell()
-        {
-        }
-
         public RemoteShell(MainPage mainPage):base(new DeviceInfo(), new Log())
         {
             this.rootPage = mainPage;

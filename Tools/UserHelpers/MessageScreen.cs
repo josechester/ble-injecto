@@ -9,6 +9,7 @@ namespace Injectoclean.Tools.UserHelpers
     {
         private ContentDialog dialog;
         private ProgressRing ring;
+        private bool IsOpen = false;
         public MessageScreen()
         {
             dialog = new ContentDialog();
@@ -19,6 +20,9 @@ namespace Injectoclean.Tools.UserHelpers
 
         public async void Show(String title)
         {
+            if (IsOpen)
+                this.Close();
+            IsOpen = true;
             dialog.Hide();
             dialog.Title = title;
             await dialog.ShowAsync();
@@ -26,6 +30,7 @@ namespace Injectoclean.Tools.UserHelpers
         public void Close()
         {
             dialog.Hide();
+            IsOpen = false;
         }
         public void setTitle(String title)
         {

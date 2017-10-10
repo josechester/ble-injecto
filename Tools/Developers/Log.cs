@@ -1,15 +1,11 @@
 ﻿using Injectoclean.Tools.BLE;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Foundation.Diagnostics;
 using static Injectoclean.MainPage;
 
 namespace Injectoclean.Tools.Developers
 {
-     public class Log: ILog
+    public class Log: ILog
     {
         
         static LoggingChannel lc = new LoggingChannel("InjectoClean", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));

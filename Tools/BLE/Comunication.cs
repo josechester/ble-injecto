@@ -24,16 +24,14 @@ namespace Injectoclean.Tools.BLE
         protected ILog Log;
         protected Byte[] GetResponse()
         {
-            
             Byte[] temp=response;
             response = null;
             return temp;
         }
         protected Byte[] Response() => response;
 
-        protected  Comunication()
+        private  Comunication()
         {
-            Task t = GetServices();
         }
         protected Comunication(IDeviceInfo Deviceinfo,ILog Log)
         {
@@ -42,7 +40,7 @@ namespace Injectoclean.Tools.BLE
             
         }
         #region getServices&Characteristics
-        public async Task GetServices()
+        protected async Task GetServices()
         {
             bluetoothLeDevice?.Dispose();
             bluetoothLeDevice = null;
@@ -52,11 +50,15 @@ namespace Injectoclean.Tools.BLE
             int i = 0;
             foreach (GattDeviceService service in result.Services)
             {
-               await getservices(service);
+                await getservices(service);
                 i++;
             }
             i = 0;
-            isready = true;
+        }
+        public void LogError(String message)
+        {
+            if (Log != null)
+                Log.LogMessageError(message);
         }
         private async Task getservices(GattDeviceService service)
         {
@@ -82,12 +84,12 @@ namespace Injectoclean.Tools.BLE
             {
                 var result = await InmediateAlert.ElementAt(0).characteristic.WriteValueAsync(com);
                 if (!(result == GattCommunicationStatus.Success))
-                    Log.LogMessageError($"Write failed: {result}");
+                    LogError($"Write failed: {result}");
                     
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80650003 || (uint)ex.HResult == 0x80070005)
             {
-                Log.LogMessageError(ex.Message);
+                LogError(ex.Message);
             }
            
         }
@@ -102,7 +104,7 @@ namespace Injectoclean.Tools.BLE
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80650003 || (uint)ex.HResult == 0x80070005)
             {
-                Log.LogMessageError(ex.Message);
+                LogError(ex.Message);
             }
         }
 
@@ -116,11 +118,11 @@ namespace Injectoclean.Tools.BLE
                 if (result == GattCommunicationStatus.Success)
                     AddValueChangedHandler();
                 else
-                    Log.LogMessageError($"Write failed: {result}");
+                    LogError($"Write failed: {result}");
             }
             catch (UnauthorizedAccessException ex)
             {
-                Log.LogMessageError(ex.Message);
+                LogError(ex.Message);
             }
         }
         #region ResponseHandlers
