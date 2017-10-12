@@ -118,6 +118,7 @@
     <Compile Include="Tools\Ford\GenericVin\TrainInfo.cs" />
     <Compile Include="Tools\Ford\GenericVin\VinComunication.cs" />
     <Compile Include="Tools\Ford\GenericVin\VinHelper.cs" />
+    <Compile Include="Tools\Ford\Data\Security.cs" />
     <Compile Include="Tools\UserHelpers\MessageScreen.cs" />
     <Compile Include="Tools\BLE\Comunication.cs" />
     <Compile Include="Tools\BLE\Discover.cs" />
