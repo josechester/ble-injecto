@@ -21,11 +21,6 @@ namespace Injectoclean.Views.Shell
             comunication = new RemoteShell(rootPage);
        }
 
-    private void Send_Click(object sender, RoutedEventArgs e)
-    {
-        comunication.SetupCJ4();
-    }
-
     private void up_Click(object sender, RoutedEventArgs e)
     {
         comunication.RemoteKey(Key.Up);

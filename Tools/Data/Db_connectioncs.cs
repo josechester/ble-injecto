@@ -29,7 +29,22 @@ namespace Injectoclean.Tools.Data
             }
 
         }
-        public List<String[]> consult(String consult, int rows)
+        public String[][] GetConsultAsArray(String consult, int rows)
+        {
+            List<String[]> list = new List<String[]>();
+
+            sqlite3_stmt statement = null;
+            Debug.Assert(SQLitePCL.raw.sqlite3_prepare_v2(sqlite, consult, out statement) == SQLitePCL.raw.SQLITE_OK);
+            while (SQLitePCL.raw.sqlite3_step(statement) == raw.SQLITE_ROW)
+            {
+                String[] element = new String[rows];
+                for (int i = 0; i < rows; i++)
+                    element[i] = raw.sqlite3_column_text(statement, i);
+                list.Add(element);
+            }
+            return list.ToArray();
+        }
+        public List<String[]> GetConsultAsList(String consult, int rows)
         {
             List<String[]> list = new List<String[]>();
 

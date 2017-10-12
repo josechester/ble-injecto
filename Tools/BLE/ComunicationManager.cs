@@ -14,7 +14,6 @@ namespace Injectoclean.Tools.BLE
         public void init()
         {
             Task t = base.GetServices();
-            //t.Wait();
         }
 
         #region ResponseFormats

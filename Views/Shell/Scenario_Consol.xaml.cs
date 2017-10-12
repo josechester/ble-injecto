@@ -19,18 +19,17 @@ namespace Injectoclean
     {
         private MainPage rootPage;
         private static AutoResetEvent resetEvent = new AutoResetEvent(false);
-        private SetupCJ4 setup;
+        //private SetupCJ4 setup;
         ComunicationManager comunication=MainPage.Current.Comunication;
         public Scenario_Consol()
         {
             
             InitializeComponent();
-            setup = new SetupCJ4(MainPage.Current.Comunication, "pass.cj4", MainPage.Current.messageScreen);
-            
-            
+            //setup = new SetupCJ4(MainPage.Current.Comunication, "pass.cj4", MainPage.Current.messageScreen);
+            SetupCJ4.ExecuteSetup(MainPage.Current.Comunication, "pass.cj4", MainPage.Current.messageScreen);
         }
 
-        private async void Send_Click(object sender, RoutedEventArgs e)
+        private void Send_Click(object sender, RoutedEventArgs e)
         {
             Byte[] command = CommandBuilder(message.Text);
             printonshell("Send: " + BitConverter.ToString(command).Replace("-", " "));
