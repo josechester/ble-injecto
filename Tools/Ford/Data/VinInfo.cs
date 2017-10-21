@@ -3,6 +3,7 @@ namespace Injectoclean.Tools.Ford.Data
 {
     public class VinInfo
     {
+
         public String getVinGroup2() => vinGroup2;
 
         public void setVinGroup2(String vinGroup2) => this.vinGroup2 = vinGroup2;
@@ -25,7 +26,12 @@ namespace Injectoclean.Tools.Ford.Data
             this.vinGroup3 = g3;
             this.vinYear = year;
         }
-
-
+        public String ToString
+        {
+            get
+            {
+                return "VinYear: "+vinYear+" VinGroup2: " + vinGroup2 + " VinGroup3: " + vinGroup3;
+            }
+        }
     }
 }

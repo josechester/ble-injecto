@@ -123,7 +123,7 @@ namespace Injectoclean.Tools.BLE
             return command;
         }
         
-        public static byte[] CommandBuilder(String line)
+        private static byte[] CommandBuilder(String line)
         {
             String[] array = line.Split(' ');
             Byte[] temp = new byte[array.Length];

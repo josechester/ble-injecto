@@ -106,8 +106,10 @@
     <Compile Include="Tools\BLE\ILockScreen.cs" />
     <Compile Include="Tools\BLE\ILog.cs" />
     <Compile Include="Tools\BLE\SetupCJ4.cs" />
+    <Compile Include="Tools\BLE\Shell.cs" />
     <Compile Include="Tools\Developers\DeviceInfo.cs" />
     <Compile Include="Tools\Developers\Log.cs" />
+    <Compile Include="Tools\FordKeyUp.cs" />
     <Compile Include="Tools\Ford\Data\CarID.cs" />
     <Compile Include="Tools\Ford\Data\FordCarInfo.cs" />
     <Compile Include="Tools\Ford\Data\FordData.cs" />

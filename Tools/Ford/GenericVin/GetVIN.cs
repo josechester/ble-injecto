@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Injectoclean.Tools.Ford.GenericVin
 {
-    class GetVIN
+    static class GetVIN
     {
 
         public static Byte[] getISO15765VIN(int protocol,ComunicationManager comunication)
@@ -19,8 +19,12 @@ namespace Injectoclean.Tools.Ford.GenericVin
             ComunicationManager.PutTaskDelay(200);
             if ((input = executeSendReceiveMode09(protocol,0x02, new VinComunication(comunication))) == null)
                     comunication.LogError("Comunication Fail");
-
-            if (input[7] == 0x7f && input[9] == 0x78)
+            if (input == null)
+            {
+                comunication.LogError("getISO15765VIN could get VIN");
+                return null;
+            }
+                if (input[7] == 0x7f && input[9] == 0x78)
             {
                 long startTime =  DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
                 int intentos = 0;

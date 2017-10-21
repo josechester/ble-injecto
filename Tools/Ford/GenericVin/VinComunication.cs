@@ -65,9 +65,13 @@ namespace Injectoclean.Tools.Ford.GenericVin
             Byte[] input=null;
             for (int i = 0; i< 3; i++)
             {
-            input = null;
+                input = null;
                  ComunicationManager.PutTaskDelay(30);
                 input = comunication.GetLastResponse(output, 500, 1);
+                if (input == null)
+                {
+                    continue;
+                }
                 if (input!=null && input[1] != 0x00 && input[1] != 0x80 && input[1] == output[1])
                 {
                     comunication.LogError("");
@@ -92,6 +96,10 @@ namespace Injectoclean.Tools.Ford.GenericVin
             for (int i = 0; i < 12; i++)
             {
                 input = comunication.GetLastResponse(output, time, 1);
+                if (input != null)
+                {
+                    continue;
+                }
                 if (input[1] != 0x00 && input[1] != 0x80 && input[2] == 0x41 && input[3] == 0x6b)
                     comunication.LogError("");
             }
@@ -112,12 +120,19 @@ namespace Injectoclean.Tools.Ford.GenericVin
                 num = 0;
                 offset = 0;
                 input = comunication.GetLastResponse(output, 400, 1);
+                if (input == null)
+                {
+                    continue;
+                }
                 Byte[][] response = comunication.GetResponses(400, 0);
                 int j = 0;
                 if (response != null)
                     j = response.Length;
                 else
+                {
                     comunication.LogError("response is null");
+                    continue;
+                }
                 do
                 {
                     //validar si se recibio un tren valido
@@ -178,8 +193,13 @@ namespace Injectoclean.Tools.Ford.GenericVin
                 if (brand == 0x01)
                      ComunicationManager.PutTaskDelay(4000);
                 input = comunication.GetLastResponse(output, 400, 1);
+              
                 do
                 {
+                    if (input == null)
+                    {
+                        continue;
+                    }
                     //validar si se recibio un tren valido de la pila
                     if (input[0] != 0x40 || input[1] == 0x80)
                     {
@@ -204,8 +224,8 @@ namespace Injectoclean.Tools.Ford.GenericVin
                             }
                         }
                     }
-                    ret = comunication.GetLastResponse(400,1).Length;
-                   
+                    
+                    ret = comunication.GetLastResponse(400,1).Length;                  
                 } while (ret == 14);
 
                 if (brand != 0x01 && detect == true)
@@ -257,9 +277,11 @@ namespace Injectoclean.Tools.Ford.GenericVin
                             time = 3000;
                         else
                             time = 1000;
-
-
                         input = comunication.GetLastResponse(output, time, 1);
+                        if (input == null)
+                        {
+                            continue;
+                        }
                         if (time < 3500)
                         {
                             bytes_received = input.Length;
@@ -355,14 +377,18 @@ namespace Injectoclean.Tools.Ford.GenericVin
             for(int i = 0; i < 3; i++)
             {
                 input = comunication.GetLastResponse(output,400,1);
-               
+                if (input == null)
+                {
+                        continue;
+                }
                 if (input[1] == 0xa8 || input[1] == 0xa9)
                 {
-                     if (input[7] == 0x7f) { }
-                        comunication.LogError("");
+                    if (input[7] == 0x7f) { }
+                    comunication.LogError("");
                     return input;
                 }
-                 ComunicationManager.PutTaskDelay(250);
+                
+                ComunicationManager.PutTaskDelay(250);
             }
            if (input == null) { }
                 comunication.LogError("");
