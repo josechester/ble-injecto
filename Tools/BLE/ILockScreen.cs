@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Injectoclean.Tools.BLE
 {
@@ -7,7 +8,7 @@ namespace Injectoclean.Tools.BLE
         void Show(String title);
         void Close();
         void setTitle(String title);
-        void set(String title, String content, int timeout);
+        Task set(String title, String content, int timeout);
         void SetwithButton(String title, String content, String CloseButtonName);
     }
 }

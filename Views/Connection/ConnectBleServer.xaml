@@ -38,7 +38,7 @@
                 and communicates with the device.
             </TextBlock>
             <TextBlock Style="{StaticResource ListItemTextStyle}" TextWrapping="Wrap" Margin="0,10,0,0">
-                Selected device: <Run Text="{x:Bind rootPage.Deviceinfo.Name}" FontWeight="Bold"/>
+                Selected device: <Run Text="{x:Bind rootPage.BLE.Device.Name}" FontWeight="Bold"/>
             </TextBlock>
             <Button x:Name="ConnectButton" Content="Connect" Margin="0,10,0,0" Click="ConnectButton_Click"/>
             <ComboBox x:Name="ServiceList" Margin="0,10,0,0" PlaceholderText="Choose a service" Visibility="Collapsed"

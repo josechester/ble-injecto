@@ -21,7 +21,7 @@ namespace Injectoclean.Tools.BLE
         protected IDeviceInfo DeviceInfo;
         private bool findbyid = false;
         private bool watcheron = false;
-        public Discover(IDeviceInfo DeviceInfo,ILog log,ILockScreen dialog)
+        public Discover(IDeviceInfo DeviceInfo, ILog log, ILockScreen dialog)
         {
             this.log = log;
             this.dialog = dialog;
@@ -32,7 +32,7 @@ namespace Injectoclean.Tools.BLE
 
         public void Clear()
         {
-            if(ResultCollection!=null)
+            if (ResultCollection != null)
                 ResultCollection.Clear();
             if (InmediateAlert != null)
                 InmediateAlert.Clear();
@@ -54,22 +54,23 @@ namespace Injectoclean.Tools.BLE
             if (watcheron != true)
             {
                 watcheron = true;
-                StartBleDeviceWatcher();   
+                StartBleDeviceWatcher();
             }
         }
         public void Getnearlydevices(ref ObservableCollection<BluetoothLEDeviceDisplay> ResultCollection)
         {
             this.Clear();
-            if(log!=null)
+            if (log != null)
                 log.LogMessageNotification("");
             this.ResultCollection = ResultCollection;
             ResultCollection.Clear();
             findbyid = false;
             start();
-          
+
         }
         public void GetService(String id)
         {
+            dialog.Show("Finding Device ...");
             Clear();
             if (log != null)
                 log.LogMessageNotification("");
@@ -99,7 +100,7 @@ namespace Injectoclean.Tools.BLE
                     Deviceinfo = null;
             }
             start();
-                
+
 
         }
         public void GetService(BluetoothLEDeviceDisplay deviceinfo)
@@ -129,25 +130,25 @@ namespace Injectoclean.Tools.BLE
                 if (results.Status != DevicePairingResultStatus.Paired && results.Status != DevicePairingResultStatus.AlreadyPaired)
                 {
                     if (log != null)
-                        log.LogMessage("Paiting result: " + results.Status.ToString());
-                        dialog.SetwithButton("Device Connection failed", "Problem: "+results.Status.ToString(), "Ok");
+                        log.LogMessage("Pairing result: " + results.Status.ToString());
+                    dialog.SetwithButton("Device Connection failed", "Problem: " + results.Status.ToString() , "Ok");
                     DeviceInfo.Set(null);
                     Deviceinfo = null;
                     this.Clear();
-
+                    return;
                 }
             }
-                
-            
+
+
             BluetoothLEDevice bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(Deviceinfo.Id);
             GattDeviceServicesResult Gattservices = await bluetoothLeDevice.GetGattServicesAsync();
             BluetoothLEAttributeDisplay inmdiateAlert = null;
             var services = Gattservices.Services;
             int i = 0;
-            
+
             foreach (GattDeviceService service in Gattservices.Services)
             {
-                if (service.Uuid==GattAttributes.UknownService.guid)
+                if (service.Uuid == GattAttributes.UknownService.guid)
                 {
                     var characteristics = await service.GetCharacteristicsAsync();
                     foreach (GattCharacteristic c in characteristics.Characteristics)
@@ -171,19 +172,18 @@ namespace Injectoclean.Tools.BLE
             {
                 GattWriteResult result = await inmdiateAlert.characteristic.WriteValueWithResultAsync(Key.Esc);
                 //GattReadResult result = await inmdiateAlert.characteristic.ReadValueAsync();
-                if ( result.Status == GattCommunicationStatus.Success)
+                if (result.Status == GattCommunicationStatus.Success)
                 {
-                    dialog.set("Correct","Device Connection success", 1500);
+                    await dialog.set("Correct", "Device Connection success", 1500);
                     //t.Wait();
-                    ComunicationManager.PutTaskDelay(1500);
-                    dialog.Close();
+                    //ComunicationManager.PutTaskDelay(1505);
                     DeviceInfo.SetandSetup(Deviceinfo);
                     this.Clear();
                 }
                 else
                 {
                     dialog.SetwithButton("Device Connection failed", "Please Reset CJ4 manually and try again", "Ok");
-                    
+
                     DeviceInfo.Set(null);
                     Deviceinfo = null;
                 }
@@ -198,71 +198,71 @@ namespace Injectoclean.Tools.BLE
             }
             if (watcheron == true)
             {
-                 StopBleDeviceWatcher();
-                 watcheron = false;
+                StopBleDeviceWatcher();
+                watcheron = false;
             }
-         }
-         #region Device discovery
-         
-         private void StopBleDeviceWatcher()
-         {
-             if (deviceWatcher != null)
-             {
-                 // Unregister the event handlers.
-                 deviceWatcher.Added -= DeviceWatcher_Added;
-                 deviceWatcher.Updated -= DeviceWatcher_Updated;
-                 deviceWatcher.Removed -= DeviceWatcher_Removed;
-                 deviceWatcher.EnumerationCompleted -= DeviceWatcher_EnumerationCompleted;
-                 deviceWatcher.Stopped -= DeviceWatcher_Stopped;
+        }
+        #region Device discovery
 
-                 // Stop the watcher.
-                 deviceWatcher.Stop();
-                 deviceWatcher = null;
-             }
+        private void StopBleDeviceWatcher()
+        {
+            if (deviceWatcher != null)
+            {
+                // Unregister the event handlers.
+                deviceWatcher.Added -= DeviceWatcher_Added;
+                deviceWatcher.Updated -= DeviceWatcher_Updated;
+                deviceWatcher.Removed -= DeviceWatcher_Removed;
+                deviceWatcher.EnumerationCompleted -= DeviceWatcher_EnumerationCompleted;
+                deviceWatcher.Stopped -= DeviceWatcher_Stopped;
 
-         }
+                // Stop the watcher.
+                deviceWatcher.Stop();
+                deviceWatcher = null;
+            }
 
-         /// <summary>
-         ///     Starts a device watcher that looks for all nearby BT devices (paired or unpaired). Attaches event handlers and
-         ///     populates the collection of devices.
-         /// </summary>
-         private void StartBleDeviceWatcher()
-         {
-             // Additional properties we would like about the device.
-             string[] requestedProperties = { "System.Devices.Aep.DeviceAddress", "System.Devices.Aep.IsConnected" };
+        }
 
-             // BT_Code: Currently Bluetooth APIs don't provide a selector to get ALL devices that are both paired and non-paired.
-             deviceWatcher =
-                     DeviceInformation.CreateWatcher(
-                         "(System.Devices.Aep.ProtocolId:=\"{bb7bb05e-5972-42b5-94fc-76eaa7084d49}\")",
-                         requestedProperties,
-                         DeviceInformationKind.AssociationEndpoint);
+        /// <summary>
+        ///     Starts a device watcher that looks for all nearby BT devices (paired or unpaired). Attaches event handlers and
+        ///     populates the collection of devices.
+        /// </summary>
+        private void StartBleDeviceWatcher()
+        {
+            // Additional properties we would like about the device.
+            string[] requestedProperties = { "System.Devices.Aep.DeviceAddress", "System.Devices.Aep.IsConnected" };
 
-             // Register event handlers before starting the watcher.
-             deviceWatcher.Added += DeviceWatcher_Added;
-             deviceWatcher.Updated += DeviceWatcher_Updated;
-             deviceWatcher.Removed += DeviceWatcher_Removed;
-             deviceWatcher.EnumerationCompleted += DeviceWatcher_EnumerationCompleted;
-             deviceWatcher.Stopped += DeviceWatcher_Stopped;
+            // BT_Code: Currently Bluetooth APIs don't provide a selector to get ALL devices that are both paired and non-paired.
+            deviceWatcher =
+                    DeviceInformation.CreateWatcher(
+                        "(System.Devices.Aep.ProtocolId:=\"{bb7bb05e-5972-42b5-94fc-76eaa7084d49}\")",
+                        requestedProperties,
+                        DeviceInformationKind.AssociationEndpoint);
 
-             // Start over with an empty collection.
-             ResultCollection.Clear();
+            // Register event handlers before starting the watcher.
+            deviceWatcher.Added += DeviceWatcher_Added;
+            deviceWatcher.Updated += DeviceWatcher_Updated;
+            deviceWatcher.Removed += DeviceWatcher_Removed;
+            deviceWatcher.EnumerationCompleted += DeviceWatcher_EnumerationCompleted;
+            deviceWatcher.Stopped += DeviceWatcher_Stopped;
 
-             // Start the watcher.
-             deviceWatcher.Start();
-         }
+            // Start over with an empty collection.
+            ResultCollection.Clear();
 
-         private BluetoothLEDeviceDisplay FindBluetoothLEDeviceDisplay(string id)
-         {
-             foreach (BluetoothLEDeviceDisplay bleDeviceDisplay in ResultCollection)
-             {
-                 if (bleDeviceDisplay.Id == id)
-                 {
-                     return bleDeviceDisplay;
-                 }
-             }
-             return null;
-         }
+            // Start the watcher.
+            deviceWatcher.Start();
+        }
+
+        private BluetoothLEDeviceDisplay FindBluetoothLEDeviceDisplay(string id)
+        {
+            foreach (BluetoothLEDeviceDisplay bleDeviceDisplay in ResultCollection)
+            {
+                if (bleDeviceDisplay.Id == id)
+                {
+                    return bleDeviceDisplay;
+                }
+            }
+            return null;
+        }
         private BluetoothLEDeviceDisplay FindBluetoothLEbyPartofId(string id)
         {
             String temp;
@@ -280,76 +280,79 @@ namespace Injectoclean.Tools.BLE
         }
 
         private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation deviceInfo)
-         {
-             // We must update the collection on the UI thread because the collection is databound to a UI element.
-             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-             {
-                 // Protect against race condition if the task runs after the app stopped the deviceWatcher.
-                 if (sender == deviceWatcher)
-                 {
-                     // Make sure device name isn't blank or already present in the list.
-                     if (deviceInfo.Name != string.Empty && FindBluetoothLEDeviceDisplay(deviceInfo.Id) == null)
-                     {
-                         ResultCollection.Add(new BluetoothLEDeviceDisplay(deviceInfo));
-                         //to make quickly the conection
-                         if (findbyid == true && deviceInfo.Id.Contains(this.id) == true)
-                         {
-                             Deviceinfo = FindBluetoothLEDeviceDisplay(deviceInfo.Id);
-                             findbyid = false;
-                             CheckConnectionAsync();
-                         }
+        {
+            // We must update the collection on the UI thread because the collection is databound to a UI element.
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                // Protect against race condition if the task runs after the app stopped the deviceWatcher.
+                if (sender == deviceWatcher)
+                {
+                    // Make sure device name isn't blank or already present in the list.
+                    if (deviceInfo.Name != string.Empty && FindBluetoothLEDeviceDisplay(deviceInfo.Id) == null)
+                    {
+                        ResultCollection.Add(new BluetoothLEDeviceDisplay(deviceInfo));
+                        //to make quickly the conection
+                        if (findbyid == true && deviceInfo.Id.Contains(this.id) == true)
+                        {
+                            Deviceinfo = FindBluetoothLEDeviceDisplay(deviceInfo.Id);
+                            findbyid = false;
+                            CheckConnectionAsync();
+                        }
 
-                     }
-                 }
-             });
-         }
+                    }
+                }
+            });
+        }
 
-         private async void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate deviceInfoUpdate)
-         {
+        private async void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate deviceInfoUpdate)
+        {
 
-             // We must update the collection on the UI thread because the collection is databound to a UI element.
-             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-             {
-                 // Protect against race condition if the task runs after the app stopped the deviceWatcher.
-                 if (sender == deviceWatcher)
-                 {
-                     BluetoothLEDeviceDisplay bleDeviceDisplay = FindBluetoothLEDeviceDisplay(deviceInfoUpdate.Id);
-                     if (bleDeviceDisplay != null)
-                     {
-                         bleDeviceDisplay.Update(deviceInfoUpdate);
-                     }
-                 }
-             });
-         }
+            // We must update the collection on the UI thread because the collection is databound to a UI element.
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                // Protect against race condition if the task runs after the app stopped the deviceWatcher.
+                if (sender == deviceWatcher)
+                {
+                    BluetoothLEDeviceDisplay bleDeviceDisplay = FindBluetoothLEDeviceDisplay(deviceInfoUpdate.Id);
+                    if (bleDeviceDisplay != null)
+                    {
+                        bleDeviceDisplay.Update(deviceInfoUpdate);
+                    }
+                }
+            });
+        }
 
-         private async void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate deviceInfoUpdate)
-         {
-             // We must update the collection on the UI thread because the collection is databound to a UI element.
-             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-             {
-                 // Protect against race condition if the task runs after the app stopped the deviceWatcher.
-                 if (sender == deviceWatcher)
-                 {
-                     // Find the corresponding DeviceInformation in the collection and remove it.
-                     BluetoothLEDeviceDisplay bleDeviceDisplay = FindBluetoothLEDeviceDisplay(deviceInfoUpdate.Id);
-                     if (bleDeviceDisplay != null)
-                     {
-                         ResultCollection.Remove(bleDeviceDisplay);
-                     }
-                 }
-             });
-         }
+        private async void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate deviceInfoUpdate)
+        {
+            // We must update the collection on the UI thread because the collection is databound to a UI element.
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                // Protect against race condition if the task runs after the app stopped the deviceWatcher.
+                if (sender == deviceWatcher)
+                {
+                    // Find the corresponding DeviceInformation in the collection and remove it.
+                    BluetoothLEDeviceDisplay bleDeviceDisplay = FindBluetoothLEDeviceDisplay(deviceInfoUpdate.Id);
+                    if (bleDeviceDisplay != null)
+                    {
+                        ResultCollection.Remove(bleDeviceDisplay);
+                    }
+                }
+            });
+        }
 
-         private async void DeviceWatcher_EnumerationCompleted(DeviceWatcher sender, object e)
-         {
-             // We must update the collection on the UI thread because the collection is databound to a UI element.
-             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-             {
-                 // Protect against race condition if the task runs after the app stopped the deviceWatcher.
-                 if (sender == deviceWatcher)
-                 {
-                    /* rootPage.NotifyUser($"{ResultCollection.Count} devices found. Enumeration completed.",
-                         NotifyType.StatusMessage);*/
+        private async void DeviceWatcher_EnumerationCompleted(DeviceWatcher sender, object e)
+        {
+            // We must update the collection on the UI thread because the collection is databound to a UI element.
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                // Protect against race condition if the task runs after the app stopped the deviceWatcher.
+                if (sender == deviceWatcher)
+                {
+                    dialog.SetwithButton("Device not found ", "Please retry with a CJ4 S/N", "Ok");
+
+                    DeviceInfo.Set(null);
+                    Deviceinfo = null;
+                    this.Clear();
                 }
             });
         }

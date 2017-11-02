@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,52 +37,51 @@ namespace Injectoclean.Tools.BLE
 
         public Byte[][] GetResponses(Byte[] message, int timeout, int NumMessages)
         {
+            base.response.Clear();
             Task t = base.sendrequest(message);
-            return GetResponses(timeout, NumMessages);
+            waiter(timeout, NumMessages);
+            if (response.Count == 0)
+                return null;
+            return response.ToArray();
         }
+      
 
-        public Byte[] GetLastResponse(Byte[] message, int timeout, int NumMessages)
+        public Byte[] GetLastResponse(Byte[] message, int timeout, int nresponses)
         {
-            Byte[][] responses = GetResponses(message, timeout, NumMessages);
-            if (responses == null)
+
+            base.response.Clear();
+            Task t = base.sendrequest(message);
+            waiter(timeout, nresponses);
+            if (response.Count == 0)
                 return null;
-            if (responses.Length == 0)
-                return null;
-            return responses.Last();
+            return response.Last();
         }
 
 
         public Byte[] GetLastResponse(int timeout,int nresponses)
         {
-            Byte[][] responses = GetResponses(timeout, nresponses);
-            if (responses == null)
+            base.response.Clear();
+            waiter(timeout, nresponses);
+            if (response.Count == 0)
                 return null;
-            if (responses.Length == 0)
-                return null;
-            return responses.Last();
+            return response.Last();
         }
-        public Byte[][] GetResponses(int time, int nresponses)
+        public Byte[][] GetResponses(int timeout, int nresponses)
         {
-            Task t = waitaresponse();
-      
-            List<Byte[]> responses = new List<Byte[]>();
+            base.response.Clear();
+            waiter(timeout, nresponses);
+            if (response.Count == 0)
+                return null;
+            return response.ToArray();
+        }
+        private void waiter(int time, int nresponses)
+        {
             int timeout = time;
-            while (timeout > 0)
+            while (timeout > 0 && base.response.Count()<nresponses)
             {
                 PutTaskDelay(10);
                 timeout -= 10;
-                if (base.Response() != null)
-                {
-                    responses.Add(base.GetResponse());
-                    if (nresponses != 0 && responses.Count == nresponses)
-                        timeout = 0;
-                }
-
             }
-            RemoveValueChangedHandler();
-            if (responses.Count == 0)
-                return null;
-            return responses.ToArray();
         }
         public static void PutTaskDelay(int time)
         {

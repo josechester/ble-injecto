@@ -6,41 +6,41 @@ using static Injectoclean.Tools.BLE.GattAttributes.InmediateAlert;
 
 namespace Injectoclean.Tools.BLE
 {
-    internal static class Shell
+    internal  static class Shell
     {
         // Remote Shell Commands.
-        internal static Byte DETECT = 0x00;
-        internal static Byte FORMAT = 0x01;
-        internal static Byte OPEN_FILE = 0x02;
-        internal static Byte CLOSE_FILE = 0x03;
-        internal static Byte WRITE_FILE = 0x04;
-        internal static Byte READ_FILE = 0x05;
-        internal static Byte DELETE_FILE = 0x06;
-        internal static Byte RENAME_FILE = 0x07;
-        internal static Byte DIR = 0x08;
-        internal static Byte CD = 0x09;
-        internal static Byte READ_PAGE = 0x0a;
-        internal static Byte EXEC = 0x0b;
-        internal static Byte CHECK_RAM = 0x0c;
-        internal static Byte BOOT_HC12 = 0x0d;
-        internal static Byte ERASE_HC12 = 0x0e;
-        internal static Byte WRITE_HC12 = 0x0f;
-        internal static Byte EXIT_BOOT_HC12 = 0x10;
-        internal static Byte SERIAL_HC12 = 0x11;
-        internal static Byte PROGRAM = 0xa0;
-        internal static Byte ERASE_SECTOR = 0xa1;
-        internal static Byte ERROR = 0xfe;
-        internal static Byte END_SHELL = 0xff;
+        internal static  Byte DETECT = 0x00;
+        internal static  Byte FORMAT = 0x01;
+        internal static  Byte OPEN_FILE = 0x02;
+        internal static  Byte CLOSE_FILE = 0x03;
+        internal static  Byte WRITE_FILE = 0x04;
+        internal static  Byte READ_FILE = 0x05;
+        internal static  Byte DELETE_FILE = 0x06;
+        internal static  Byte RENAME_FILE = 0x07;
+        internal static  Byte DIR = 0x08;
+        internal static  Byte CD = 0x09;
+        internal static  Byte READ_PAGE = 0x0a;
+        internal static  Byte EXEC = 0x0b;
+        internal static  Byte CHECK_RAM = 0x0c;
+        internal static  Byte BOOT_HC12 = 0x0d;
+        internal static  Byte ERASE_HC12 = 0x0e;
+        internal static  Byte WRITE_HC12 = 0x0f;
+        internal static  Byte EXIT_BOOT_HC12 = 0x10;
+        internal static  Byte SERIAL_HC12 = 0x11;
+        internal static  Byte PROGRAM = 0xa0;
+        internal static  Byte ERASE_SECTOR =0xa1;
+        internal static  Byte ERROR =0xfe;
+        internal static  Byte END_SHELL =0xff;
 
         // Remote Shell Error Commands.
-        internal static Byte ERROR_DATAFLASH_INVALID = 0x01;
-        internal static Byte ERROR_INCORRECT_SIZE = 0x02;
-        internal static Byte ERROR_CANT_OPEN_FILE = 0x03;
-        internal static Byte ERROR_DATAFLASH_NOT_FORMATED = 0x04;
-        internal static Byte ERROR_NO_OPEN_FILE = 0x05;
-        internal static Byte ERROR_WRITE = 0x06;
-        internal static Byte ERROR_FILE_DOESNT_EXISTS = 0x07;
-        internal static bool RemoteShellAccess(ComunicationManager comunication, int limit)
+        internal static  Byte ERROR_DATAFLASH_INVALID = 0x01;
+        internal static  Byte ERROR_INCORRECT_SIZE = 0x02;
+        internal static  Byte ERROR_CANT_OPEN_FILE = 0x03;
+        internal static  Byte ERROR_DATAFLASH_NOT_FORMATED = 0x04;
+        internal static  Byte ERROR_NO_OPEN_FILE = 0x05;
+        internal static  Byte ERROR_WRITE = 0x06;
+        internal static  Byte ERROR_FILE_DOESNT_EXISTS = 0x07;
+        internal  static bool RemoteShellAccess(ComunicationManager comunication, int limit)
         {
             Byte[] arg = { (byte)0x00 };
             Byte[] command = CommandBuilder(arg, (byte)0x00);
@@ -61,7 +61,7 @@ namespace Injectoclean.Tools.BLE
             else
                 return true;
         }
-        internal static bool CdToFiles(ComunicationManager comunication, int limit)
+        internal  static bool CdToFiles(ComunicationManager comunication, int limit)
         {
             Byte[] response = null;
             Byte[] command = CommandBuilder(new Byte[] { Shell.DETECT }, Shell.CD);
@@ -78,7 +78,7 @@ namespace Injectoclean.Tools.BLE
 
 
         }
-        internal static bool ExecuteFile(ComunicationManager comunication, int limit, String program)
+        internal  static bool ExecuteFile(ComunicationManager comunication, int limit, String program)
         {
             Byte[] response = null;
             Byte[] command = CommandBuilder(Encoding.ASCII.GetBytes(program + " "), Shell.EXEC);
@@ -100,7 +100,7 @@ namespace Injectoclean.Tools.BLE
             }
             return false;
         }
-        internal static byte[] CommandBuilder(byte[] arg, byte modeForCd)
+        internal  static byte[] CommandBuilder(byte[] arg, byte modeForCd)
         {
             arg[arg.Length - 1] = (byte)0x00;
             byte[] basecommand = { 0x77, modeForCd, (byte)(arg.Length / 256), (byte)(arg.Length % 256), 0x00 };
@@ -116,7 +116,7 @@ namespace Injectoclean.Tools.BLE
             return command;
         }
 
-        internal static byte[] CommandBuilder(String line)
+        internal  static byte[] CommandBuilder(String line)
         {
             String[] array = line.Split(' ');
             Byte[] temp = new byte[array.Length];
@@ -131,7 +131,7 @@ namespace Injectoclean.Tools.BLE
             Command[14] -= Command[0];
             return Command;
         }
-        internal static Byte[] buildSendCommand(byte mode, int size, byte[] arg)
+        internal  static Byte[] buildSendCommand(byte mode, int size, byte[] arg)
         {
             byte[] baseCommand = { 0x77, 0x00, 0x00, 0x00, 0x00 };
             byte[] command = new byte[baseCommand.Length + size + 1];
@@ -148,50 +148,41 @@ namespace Injectoclean.Tools.BLE
         }
         internal static bool CopyPCToFlash(ComunicationManager comunication, String source, String path)
         {
-            int offset = 512;
-            Byte[] request = buildSendCommand(Shell.OPEN_FILE, 512, new Byte[] { 0x00 });
-            Byte[] destinybytes = Encoding.ASCII.GetBytes(source + " ");
-            request[5] = 0;
-            Array.Copy(destinybytes, 0, request, 6, destinybytes.Length);
-            request[7 + destinybytes.Length] = 0x78;
-            request[3] = (Byte)(source.Length + 2);
-
-            if (!CheckResponse(comunication.GetLastResponse(request, 400, 1), Shell.OPEN_FILE))
-                return false;
+            int offset = 14;
+            byte[] filename = new byte[source.Length+2];
+            filename[0] = 0x00;
+            filename[filename.Length-1] = 0x00;
+            Array.Copy(Encoding.ASCII.GetBytes(source), 0, filename, 1, source.Length);
+            Byte[] request = buildSendCommand(Shell.OPEN_FILE, filename.Length, filename);
+           
+            Byte[] response = comunication.GetLastResponse(request, 3000, 1);
+            if (!CheckResponse(response, Shell.OPEN_FILE))
+              return false;
             //send file
-            request[0] = 0x77;
-            request[1] = Shell.WRITE_FILE;
-            request[2] = 0x00;
-            request[3] = 0x00;
-            request[4] = 0x00;
-            Byte[] buffer = File.ReadAllBytes(@path + source);
+
+            Byte[] buffer = File.ReadAllBytes(Directory.GetCurrentDirectory() + path + source);
             int frames = (buffer.Length / offset);
-            for (int i = 0; i < (frames + 1); i++)
+            for (int i = 0; i <=frames ; i++)
             {
-                if (i == frames - 1)
-                    Array.Copy(buffer, i * offset, request, 6, buffer.Length - (frames * offset));
+                //if ((frames % 50) == 0)
+                //    ComunicationManager.PutTaskDelay(1000);
+                if (i == frames)
+                    request = buildSendCommand(Shell.WRITE_FILE, buffer.Length - (frames * offset), buffer.Skip(i * offset).Take(buffer.Length - (frames * offset)).ToArray());
                 else
-                    Array.Copy(buffer, i * offset, request, 6, offset);
-                request[2] = (Byte)(offset >> 8);
-                request[3] = (Byte)(offset);
-                request[offset + 5] = 0x78;
-                if (!CheckResponse(comunication.GetLastResponse(request, 400, 1), Shell.WRITE_FILE))
+                    request = buildSendCommand(Shell.WRITE_FILE, offset, buffer.Skip(i * offset).Take(offset).ToArray());
+                response = comunication.GetLastResponse(request, 500, 1);
+                if (!CheckResponse(response, Shell.WRITE_FILE))
                     return false;
+
             }
             //file close
-            request[0] = 0x77;
-            request[1] = Shell.CLOSE_FILE;
-            request[2] = 0x00;
-            request[3] = 0x00;
-            request[4] = 0x00;
-            request[5] = 0x78;
-            if (!CheckResponse(comunication.GetLastResponse(request, 400, 1), Shell.WRITE_FILE))
+            request = buildSendCommand(Shell.CLOSE_FILE, 0,null);
+            if (!CheckResponse(comunication.GetLastResponse(request, 400, 1), Shell.CLOSE_FILE))
                 return false;
             return true;
         }
-        internal static bool CheckResponse(Byte[] Response, Byte command)
+        internal  static bool CheckResponse(Byte[] Response, Byte command)
         {
-
             if (Response != null)
             {
                 if (Response[0] == 0x57 &&

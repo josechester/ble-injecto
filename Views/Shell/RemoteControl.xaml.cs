@@ -1,4 +1,4 @@
-﻿using Injectoclean.Tools.Developers;
+﻿using Injectoclean.Tools.BLE;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using static Injectoclean.Tools.BLE.GattAttributes.InmediateAlert;
@@ -12,48 +12,47 @@ namespace Injectoclean.Views.Shell
     /// </summary>
     public sealed partial class RemoteControl : Page
     {
-        private MainPage rootPage;
-        RemoteShell comunication;
+        ComunicationManager comunication;
         public RemoteControl()
         {
             this.InitializeComponent();
-            rootPage = MainPage.Current;
-            comunication = new RemoteShell(rootPage);
-       }
+            
+            comunication = MainPage.Current.BLE.Comunication;
+        }
 
     private void up_Click(object sender, RoutedEventArgs e)
     {
-        comunication.RemoteKey(Key.Up);
+        comunication.SendCommand(Key.Up);
     }
 
     private void left_Click(object sender, RoutedEventArgs e)
     {
-        comunication.RemoteKey(Key.Left);
+        comunication.SendCommand(Key.Left);
     }
 
     private void down_Click(object sender, RoutedEventArgs e)
     {
-        comunication.RemoteKey(Key.Down);
+        comunication.SendCommand(Key.Down);
     }
 
     private void right_Click(object sender, RoutedEventArgs e)
     {
-        comunication.RemoteKey(Key.Right);
+        comunication.SendCommand(Key.Right);
     }
 
     private void enter_Click(object sender, RoutedEventArgs e)
     {
-        comunication.RemoteKey(Key.Enter);
+        comunication.SendCommand(Key.Enter);
     }
 
     private void reset_Click(object sender, RoutedEventArgs e)
     {
-        comunication.RemoteKey(Key.Reset);
+        comunication.SendCommand(Key.Reset);
     }
 
     private void escape_Click(object sender, RoutedEventArgs e)
     {
-        comunication.RemoteKey(Key.Esc);
+        comunication.SendCommand(Key.Esc);
     }
 
 }

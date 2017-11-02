@@ -23,33 +23,11 @@ namespace Injectoclean
 
          };
 
-        public Log Log = new Log();
-        public DeviceInfo iDeviceinfo = new DeviceInfo();
-        public MessageScreen messageScreen = new MessageScreen();
-        private BluetoothLEDeviceDisplay deviceinfo = null;
-        private ComunicationManager comunication;
-        public BluetoothLEDeviceDisplay Deviceinfo
-        {
-            get
-            {
-                return deviceinfo;
-            }
-            set
-            {
-                this.deviceinfo = value;
-            }
-        }
+        public static Log Log = new Log();
+        public static MessageScreen messageScreen = new MessageScreen();
 
-        public void GetServices()
-        {
-            comunication = new ComunicationManager(Log, iDeviceinfo);
-            messageScreen = new MessageScreen();
-            messageScreen.Show("Setup Services ...");
-                comunication.init();
-            messageScreen.Close();
-        } 
-        public ComunicationManager Comunication { get => comunication;  }
-
+        private BLEContainer ble = new BLEContainer(Log,messageScreen);
+        public  BLEContainer BLE =>  ble; 
         public class Scenario
         {
             public string Title { get; set; }

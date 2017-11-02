@@ -39,7 +39,7 @@ namespace Injectoclean
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (rootPage.Deviceinfo==null)
+            if (!rootPage.BLE.IsConnected())
             {
                 ConnectButton.IsEnabled = false;
             }
@@ -66,7 +66,7 @@ namespace Injectoclean
             try
             {
                 // BT_Code: BluetoothLEDevice.FromIdAsync must be called from a UI thread because it may prompt for consent.
-                bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(rootPage.Deviceinfo.Id);
+                bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(rootPage.BLE.Device.Id);
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x800710df)
             {

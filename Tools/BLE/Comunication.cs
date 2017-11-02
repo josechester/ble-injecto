@@ -19,28 +19,25 @@ namespace Injectoclean.Tools.BLE
         protected GattCharacteristicsResult characteristics;
         protected bool isValueChangedHandlerRegistered = false;
         protected bool isready = false;
-        private Byte[] response;
         private BluetoothLEDeviceDisplay Deviceinfo;
         protected ILog Log;
-        protected Byte[] GetResponse()
-        {
-            Byte[] temp=response;
-            response = null;
-            return temp;
-        }
-        protected Byte[] Response() => response;
+
+        protected List<Byte[]> response;
 
         private  Comunication()
         {
+            
+           
         }
         protected Comunication(IDeviceInfo Deviceinfo,ILog Log)
         {
             this.Deviceinfo = Deviceinfo.Get(); 
             this.Log = Log;
-            
-        }
-        #region getServices&Characteristics
-        protected async Task GetServices()
+            response = new List<Byte[]>();
+
+    }
+    #region getServices&Characteristics
+    protected async Task GetServices()
         {
             bluetoothLeDevice?.Dispose();
             bluetoothLeDevice = null;
@@ -53,12 +50,17 @@ namespace Injectoclean.Tools.BLE
                 await getservices(service);
                 i++;
             }
-            i = 0;
+            waitaresponse();
         }
         public void LogError(String message)
         {
             if (Log != null)
                 Log.LogMessageError(message);
+        }
+        public void LogNotification(String message)
+        {
+            if (Log != null)
+                Log.LogMessageNotification(message);
         }
         private async Task getservices(GattDeviceService service)
         {
@@ -97,10 +99,13 @@ namespace Injectoclean.Tools.BLE
         {
             try
             {
+
                 var result = await Custom.ElementAt(1).characteristic.WriteValueAsync(
                     CryptographicBuffer.CreateFromByteArray(message));
                 if (!(result == GattCommunicationStatus.Success))
-                    Log.LogMessageError($"Write failed: {result}");
+                    LogError($"Write failed: {result}");
+                   // else
+                    //LogNotification($"Write success: {result}");
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80650003 || (uint)ex.HResult == 0x80070005)
             {
@@ -110,15 +115,18 @@ namespace Injectoclean.Tools.BLE
 
         protected async Task waitaresponse()
         {
-            response = null;
             try
             {
                 var result = await Custom.ElementAt(0).characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
                             GattClientCharacteristicConfigurationDescriptorValue.Notify);
                 if (result == GattCommunicationStatus.Success)
+                {
                     AddValueChangedHandler();
+                   // LogNotification($"waiting results {result}");
+                }
                 else
                     LogError($"Write failed: {result}");
+
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -128,9 +136,13 @@ namespace Injectoclean.Tools.BLE
         #region ResponseHandlers
         private void Characteristic_ValueChanged(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
+            Byte[] returned;
             if (args != null)
             {
-                CryptographicBuffer.CopyToByteArray(args.CharacteristicValue, out response);
+                
+                CryptographicBuffer.CopyToByteArray(args.CharacteristicValue, out returned);
+               // LogNotification($"value:" + GetStringResponse(returned));
+                response.Add(returned);
             }
         }
         protected void RemoveValueChangedHandler()
@@ -150,10 +162,8 @@ namespace Injectoclean.Tools.BLE
             }
         }
         #endregion
-        
-        protected String GetStringResponse()
+        protected String GetStringResponse(Byte[] array)
         {
-            Byte[] array = GetResponse();
             String temp = "";
             for (int i = 0; i < array.Length; i++)
             {

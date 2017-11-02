@@ -17,21 +17,20 @@ namespace Injectoclean
     /// </summary>
     public sealed partial class Scenario_Consol : Page
     {
-        private MainPage rootPage;
         private static AutoResetEvent resetEvent = new AutoResetEvent(false);
-        //private SetupCJ4 setup;
-        ComunicationManager comunication=MainPage.Current.Comunication;
+        ComunicationManager comunication;
         public Scenario_Consol()
         {
-            
+           
             InitializeComponent();
+            comunication = MainPage.Current.BLE.Comunication;
             //setup = new SetupCJ4(MainPage.Current.Comunication, "pass.cj4", MainPage.Current.messageScreen);
-            SetupCJ4.ExecuteSetup(MainPage.Current.Comunication, "pass.cj4", MainPage.Current.messageScreen);
+            SetupCJ4.ExecuteSetup(comunication, "pass.cj4", MainPage.messageScreen);
         }
 
         private void Send_Click(object sender, RoutedEventArgs e)
         {
-            /*Byte[] command = CommandBuilder(message.Text);
+            Byte[] command = CommandBuilder(message.Text);
             printonshell("Send: " + BitConverter.ToString(command).Replace("-", " "));
             Byte[] input=comunication.GetLastResponse(command,300,1);
             printonshell("Response: " + comunication.GetstringFromBytes(input));
@@ -46,30 +45,30 @@ namespace Injectoclean
             Byte[] code = { Convert.ToByte(Stringcode[0], 16), Convert.ToByte(Stringcode[1], 16), Convert.ToByte(Stringcode[2], 16) };
             code = FordSecurity.GetSecureCodeKey(seed, code);
             printonshell(comunication.GetstringFromBytes(code));*/
-            Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-            () =>
-            {
-                VinHelper vinHelper = new VinHelper(comunication);
-                vinHelper.setProtocol(TrainInfo.NONE);
-                if (!vinHelper.autodetectProtocol())
-                    printonshell("Could'n outodetect protocol");
-                Byte[] info = vinHelper.GetVin();
-                if (info == null)
-                {
-                    printonshell("Could'n get train info");
-                    return;
-                }
-                VinInfo vinInfo = vinHelper.getVINInfoFord(info);
-                if (vinInfo == null)
-                    printonshell("vininfo es null");
-                else
-                {
-                    printonshell(vinInfo.ToString());
-                    FordCarInfo car = FordData.getFordCarInfo(vinInfo);
-                    printonshell("Forcarinfo okay");
-                }
-            }
-            );
+            //Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            //() =>
+            //{
+            //    VinHelper vinHelper = new VinHelper(comunication);
+            //    vinHelper.setProtocol(TrainInfo.NONE);
+            //    if (!vinHelper.autodetectProtocol())
+            //        printonshell("Could'n outodetect protocol");
+            //    Byte[] info = vinHelper.GetVin();
+            //    if (info == null)
+            //    {
+            //        printonshell("Could'n get train info");
+            //        return;
+            //    }
+            //    VinInfo vinInfo = vinHelper.getVINInfoFord(info);
+            //    if (vinInfo == null)
+            //        printonshell("vininfo es null");
+            //    else
+            //    {
+            //        printonshell(vinInfo.ToString());
+            //        FordCarInfo car = FordData.getFordCarInfo(vinInfo);
+            //        printonshell("Forcarinfo okay");
+            //    }
+            //}
+            //);
           //  DoWorkAsync();
 
         }

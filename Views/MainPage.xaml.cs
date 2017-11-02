@@ -62,7 +62,7 @@ namespace Injectoclean
 
             if (s != null)
             {
-                if (s.Title == "Discover servers" || Deviceinfo != null)
+                if (s.Title == "Discover servers" || BLE != null)
                 {
                     ScenarioFrame.Navigate(s.ClassType);
                 }

@@ -15,25 +15,26 @@ namespace Injectoclean
         private MainPage rootPage = MainPage.Current;
 
         private ObservableCollection<BluetoothLEDeviceDisplay> ResultCollection = new ObservableCollection<BluetoothLEDeviceDisplay>();
-        private Discover discover;
+
+
 
         public DiscoverBleServer()
         {
             InitializeComponent();
             ResultsListView.Header=
-            discover = new Discover(new DeviceInfo(),new Log(), new MessageScreen());
+            
             bydevice.IsChecked = true;
         }
         private void EnumerateButton_Click(object sender, RoutedEventArgs e)
         {
             rootPage.NotifyUser(String.Empty, NotifyType.StatusMessage);
-            discover.Getnearlydevices(ref ResultCollection);
+            MainPage.Current.BLE.Discover.Getnearlydevices(ref ResultCollection);
         }
         private void BConect_click(object sender, RoutedEventArgs e)
         {
             if(txt_id.Text.Length==5 && txt_id.Text.Length < 7)
             {
-                discover.GetService(txt_id.Text);
+                MainPage.Current.BLE.Discover.GetService(txt_id.Text);
             }
                 
             else
@@ -42,7 +43,7 @@ namespace Injectoclean
 
         private void ConectById_Checked(object sender, RoutedEventArgs e)
         {
-            discover.Clear();
+            MainPage.Current.BLE.Discover.Clear();
             ResultCollection.Clear();
             //Connect.visibility = Visibility.Visible;
             Bconectdevice.Visibility = Visibility.Collapsed;
@@ -63,16 +64,16 @@ namespace Injectoclean
         private void BConectdevice_click(object sender, RoutedEventArgs e)
         {
             if(ResultsListView.SelectedItem!=null)
-            discover.GetService(ResultsListView.SelectedItem as BluetoothLEDeviceDisplay);
+                MainPage.Current.BLE.Discover.GetService(ResultsListView.SelectedItem as BluetoothLEDeviceDisplay);
             else
                 rootPage.NotifyUser("Please select a device on the list", NotifyType.ErrorMessage);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (this.discover != null)
+            if (MainPage.Current.BLE.Discover != null)
             {
-                discover.Clear();
+                MainPage.Current.BLE.Discover.Clear();
             }
         }
     }

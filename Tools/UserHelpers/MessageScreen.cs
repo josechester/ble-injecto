@@ -7,57 +7,53 @@ namespace Injectoclean.Tools.UserHelpers
     public class MessageScreen : ILockScreen
     {
         private ContentDialog dialog;
-        private ProgressRing ring;
-        private bool IsOpen = false;
         public void Close()
         {
             dialog.Hide();
-            IsOpen = false;
         }
 
         public void setTitle(string title)
         {
-            dialog.Title = title;
-            dialog.Content = ring;
-
+            this.Show(title);
         }
 
         public void SetwithButton(string title, string content, string CloseButtonName)
         {
+            if (dialog != null)
+                dialog.Hide();
+            dialog = new ContentDialog();
             dialog.Title = title;
             dialog.Content = content;
             dialog.CloseButtonText = CloseButtonName;
+            dialog.ShowAsync();
 
         }
 
-        public /*async*/ void Show(string title)
+        public void Show(string title)
         {
-            if (IsOpen)
-                this.Close();
-            IsOpen = true;
-            dialog.Hide();
-            dialog.Title = title;
-            /*await*/ dialog.ShowAsync();
-        }
-       
-        public MessageScreen()
-        {
+            if (dialog != null)
+                dialog.Hide();
             dialog = new ContentDialog();
-            ring = new ProgressRing();
+            dialog.Title = title;
+            ProgressRing ring = new ProgressRing();
             ring.IsActive = true;
             dialog.Content = ring;
+            dialog.ShowAsync();
         }
 
-        async Task PutTaskDelay(int time)
+        public MessageScreen()
         {
-            await Task.Delay(time);
         }
 
-        public async void set(string title, string content, int timeout)
+        public async Task set(string title, string content, int timeout)
         {
+            if (dialog != null)
+                dialog.Hide();
+            dialog = new ContentDialog();
             dialog.Title = title;
             dialog.Content = content;
-            await PutTaskDelay(timeout);
+            dialog.ShowAsync();
+            await Task.Delay(timeout);
             this.Close();
         }
     }
