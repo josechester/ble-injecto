@@ -32,8 +32,11 @@ namespace Injectoclean
         {
             Byte[] command = CommandBuilder(message.Text);
             printonshell("Send: " + BitConverter.ToString(command).Replace("-", " "));
-            Byte[] input=comunication.GetLastResponse(command,300,1);
+            Byte[] input=comunication.GetLastResponse(command,800,1);
+            if(input!=null)
             printonshell("Response: " + comunication.GetstringFromBytes(input));
+            else
+            printonshell("Response: ");
             /*List<String[]> info = FordData.GetIds();
             foreach (String[] a in info)
                 printonshell(a[0].ToString());*/
@@ -69,7 +72,7 @@ namespace Injectoclean
             //    }
             //}
             //);
-          //  DoWorkAsync();
+            //  DoWorkAsync();
 
         }
         private Task DoWorkAsync() // No async because the method does not need await
@@ -106,15 +109,12 @@ namespace Injectoclean
 
             String[] array = line.Split(' ');
             Byte[] temp = new byte[array.Length];
-            Byte[] Command = Enumerable.Repeat((byte)0x00, 15).ToArray();
-
+            Byte[] Command = Enumerable.Repeat((byte)0x00, array.Length).ToArray();
             for (int i = 0; i < array.Length; i++)
             {
                 temp[i] = (byte)Convert.ToInt32(array[i], 16);
                 Command[i] = temp[i];
-                Command[14] += Command[i];
             }
-            Command[14] -= Command[0];
             return Command;
         }
 
